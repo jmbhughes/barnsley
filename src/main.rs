@@ -3,7 +3,7 @@ use rand::prelude::*;
 use rand::distributions::WeightedIndex;
 use ndarray::Array3;
 use image::{RgbImage, ImageBuffer, Rgb};
-use rayon::prelude::*;
+use rand_distr::{Normal, Distribution};
 
 
 #[derive(Copy, Clone)]
@@ -108,7 +108,10 @@ impl AffineTransform {
         let d: f32 = rng.gen::<f32>() * 2. - 1.;
         let xshift: f32 = rng.gen::<f32>() * 4. - 2.;
         let yshift: f32 = rng.gen::<f32>() * 4. - 2.;
-        let weight: f32 = rng.gen::<f32>();
+
+        let normal: Normal<f64> = Normal::new(1.0, 0.15).unwrap();
+        let weight: f32 = normal.sample(&mut rng) as f32;
+
         AffineTransform { a, b, c, d, xshift, yshift, base_color: Color::random(), weight}
     }
 }
@@ -289,16 +292,28 @@ fn main() {
     let mut c: f32 = rng.gen::<f32>() * 2. - 1.;
     let mut d: f32 = rng.gen::<f32>() * 2. - 1.;
     
+    let t0 = Box::new(AffineTransform::random());
     let t1 = Box::new(AffineTransform::random());
     let t2 = Box::new(AffineTransform::random());
     let t3 = Box::new(AffineTransform::random());
     let t4 = Box::new(AffineTransform::random());
+    let t5 = Box::new(AffineTransform::random());
+    let t6 = Box::new(AffineTransform::random());
+    let t7 = Box::new(AffineTransform::random());
+    let t8 = Box::new(AffineTransform::random());
+    let t9 = Box::new(AffineTransform::random());
 
     let mut my_ifs = IFS::new();
+    my_ifs.add_transform(t0);
     my_ifs.add_transform(t1);
     my_ifs.add_transform(t2);
     my_ifs.add_transform(t3);
     my_ifs.add_transform(t4);
+    my_ifs.add_transform(t5);
+    my_ifs.add_transform(t6);
+    my_ifs.add_transform(t7);
+    my_ifs.add_transform(t8);
+    my_ifs.add_transform(t9);
 
     let num_points = 10000;
     let num_iterations = 1000;
