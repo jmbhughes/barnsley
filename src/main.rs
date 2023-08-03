@@ -5,8 +5,8 @@ use barnsley::image::Image;
 fn main() {    
     let t0 = Box::new(MoebiusTransform::random());
     let t1 = Box::new(MoebiusTransform::random());
-    let t2 = Box::new(AffineTransform::random());
-    let t3 = Box::new(AffineTransform::random());
+    let t2 = Box::new(InverseJuliaTransform::random());
+    let t3 = Box::new(InverseJuliaTransform::random());
     let t4 = Box::new(AffineTransform::random());
 
     let mut my_ifs = IFS::new();
@@ -21,6 +21,6 @@ fn main() {
 
     let mut image = Image::new(512, 512);
     my_ifs.evaluate(&mut image, num_points, num_iterations);
-    image.save("example.png", 1.max((num_points * num_iterations) / (image.height() * image.width())));
+    image.save("example5.png", 1.max((num_points * num_iterations) / (image.height() * image.width())));
 }
 

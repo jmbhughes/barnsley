@@ -1,6 +1,8 @@
+use std::f32::consts::PI;
+
 use num_complex::Complex32;
 use rand::prelude::*;
-use rand_distr::{Normal, Distribution};
+use rand_distr::{Normal, Distribution, num_traits::FloatConst};
 use crate::util::*;
 
 
@@ -19,9 +21,9 @@ pub trait Transform {
     fn get_base_color(&self) -> Color;
     fn transform_color(&self, current_color: Color) -> Color {
         let base_color = self.get_base_color();
-        Color{r: (base_color.r + current_color.r) / 2.0,
-              g: (base_color.g + current_color.g) / 2.0,
-              b: (base_color.b + current_color.b) / 2.0
+        Color{r: (base_color.r + current_color.r) / 3.0,
+              g: (base_color.g + current_color.g) / 3.0,
+              b: (base_color.b + current_color.b) / 3.0
         }
     }
     fn transform_point(&self, point: Point) -> Point;
@@ -152,6 +154,50 @@ impl Transform for MoebiusTransform {
         let z = Complex32{re: point.x, im: point.y};
         let z2 = (self.a * z + self.b) / (self.c * z + self.d);
         Point{x:z2.re, y: z2.im}
+    }
+
+    fn get_weight(&self) -> f32 {
+        self.weight
+    }
+
+    fn get_base_color(&self) -> Color {
+        self.base_color
+    }
+}
+
+pub struct InverseJuliaTransform{
+    r: f32,
+    theta: f32, 
+    base_color: Color,
+    weight: f32
+}
+
+impl InverseJuliaTransform {
+    pub fn new(r: f32, theta: f32, base_color: Color, weight: f32) -> InverseJuliaTransform {
+        InverseJuliaTransform { r, theta, base_color: base_color, weight: weight }
+    }
+
+    pub fn random() -> InverseJuliaTransform {
+        let mut rng = rand::thread_rng();
+
+        let r: f32 = rng.gen::<f32>().sqrt() * 0.4 + 0.8;
+        let theta: f32 = 2.0 * PI * rng.gen::<f32>();
+
+        let normal: Normal<f64> = Normal::new(1.0, 0.15).unwrap();
+        let weight: f32 = normal.sample(&mut rng) as f32;
+
+        InverseJuliaTransform { r, theta, base_color: Color::random(), weight}
+    }
+}
+
+impl Transform for InverseJuliaTransform {
+    fn transform_point(&self, point: Point) -> Point {
+        let c = Complex32::new(self.r * self.theta.cos(), self.r * self.theta.sin());
+        let z = Complex32{re: point.x, im: point.y};
+        let z2 = c - z;
+        let new_theta = z2.im.atan2(z2.re) * 0.5;
+        let sqrt_r = vec![1., -1.].choose(&mut rand::thread_rng()).unwrap() * ((z2.im * z2.im + z2.re * z2.re).powf(0.25));
+        Point{x:sqrt_r * new_theta.cos(), y: sqrt_r * new_theta.sin()}
     }
 
     fn get_weight(&self) -> f32 {
