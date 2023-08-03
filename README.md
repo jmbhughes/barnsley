@@ -2,7 +2,7 @@
 
 Make your own images like this!
 
-![example image](https://github.com/jmbhughes/barnsley/blob/main/example.png?raw=true)
+![example image](https://github.com/jmbhughes/barnsley/blob/main/examples/example4.png?raw=true)
 
 This is based upon [pyifs](https://github.com/jtauber/pyifs) written by [James Tauber](https://github.com/jtauber) for Python. 
 
