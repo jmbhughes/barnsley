@@ -1,9 +1,10 @@
 use std::f32::consts::PI;
-
-use num_complex::Complex32;
+use serde::{Serialize, Deserialize, de::DeserializeOwned};
+use num_complex::{Complex, Complex32};
 use rand::prelude::*;
 use rand_distr::{Normal, Distribution, num_traits::FloatConst};
 use crate::util::*;
+use enum_dispatch::enum_dispatch;
 
 
 pub fn _final_transform(x: f32, y: f32) -> (f32, f32) {
@@ -17,7 +18,17 @@ pub fn _final_transform(x: f32, y: f32) -> (f32, f32) {
     return (z2.re, z2.im)
 }
 
-pub trait Transform {
+#[enum_dispatch]
+pub enum TransformEnum {
+    LinearTransform,
+    AffineTransform,
+    InverseJuliaTransform,
+    MoebiusTransform,
+}
+
+
+#[enum_dispatch(TransformEnum)]
+pub trait Transform{
     fn get_base_color(&self) -> Color;
     fn transform_color(&self, current_color: Color) -> Color {
         let base_color = self.get_base_color();
@@ -120,7 +131,7 @@ impl Transform for AffineTransform {
 }
 
 pub struct MoebiusTransform{
-    a: Complex32,
+    a: Complex<f32>,
     b: Complex32, 
     c: Complex32,
     d: Complex32,
@@ -169,12 +180,14 @@ pub struct InverseJuliaTransform{
     r: f32,
     theta: f32, 
     base_color: Color,
-    weight: f32
+    weight: f32,
+    c: Complex32
 }
 
 impl InverseJuliaTransform {
     pub fn new(r: f32, theta: f32, base_color: Color, weight: f32) -> InverseJuliaTransform {
-        InverseJuliaTransform { r, theta, base_color: base_color, weight: weight }
+        let c = Complex32::new(r * theta.cos(), r * theta.sin());
+        InverseJuliaTransform { r, theta, base_color: base_color, weight: weight, c: c}
     }
 
     pub fn random() -> InverseJuliaTransform {
@@ -186,15 +199,14 @@ impl InverseJuliaTransform {
         let normal: Normal<f64> = Normal::new(1.0, 0.15).unwrap();
         let weight: f32 = normal.sample(&mut rng) as f32;
 
-        InverseJuliaTransform { r, theta, base_color: Color::random(), weight}
+        InverseJuliaTransform::new(r, theta, Color::random(), weight)
     }
 }
 
 impl Transform for InverseJuliaTransform {
     fn transform_point(&self, point: Point) -> Point {
-        let c = Complex32::new(self.r * self.theta.cos(), self.r * self.theta.sin());
         let z = Complex32{re: point.x, im: point.y};
-        let z2 = c - z;
+        let z2 = self.c - z;
         let new_theta = z2.im.atan2(z2.re) * 0.5;
         let sqrt_r = vec![1., -1.].choose(&mut rand::thread_rng()).unwrap() * ((z2.im * z2.im + z2.re * z2.re).powf(0.25));
         Point{x:sqrt_r * new_theta.cos(), y: sqrt_r * new_theta.sin()}
@@ -208,3 +220,4 @@ impl Transform for InverseJuliaTransform {
         self.base_color
     }
 }
+

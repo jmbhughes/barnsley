@@ -1,7 +1,8 @@
 use rand::prelude::*;
 use num_complex::Complex32;
+use serde::{Serialize, Deserialize};
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Serialize, Deserialize)]
 pub struct Color {
     pub r: f32, 
     pub g: f32, 

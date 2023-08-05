@@ -10,28 +10,30 @@ use crate::transform::*;
 use crate::image::*;
 
 pub struct IFS {
-    transforms: Vec<Box< dyn Transform + Sync>>,
+    transforms: Vec<TransformEnum>,
     num_transforms: usize,
-    total_weight: f32
+    total_weight: f32,
+    distribution: WeightedIndex<f32>
 }
 
 impl IFS{
     pub fn new() -> IFS {
         IFS{transforms: vec![],
         num_transforms: 0,
-        total_weight: 0.}
+        total_weight: 0.,
+        distribution: WeightedIndex::new([1.]).unwrap()}
     }
 
-    pub fn add_transform<'a>(&mut self, transform: Box<dyn Transform + Sync>) {
+    pub fn add_transform<'a>(&mut self, transform: TransformEnum) {
         self.total_weight += transform.get_weight();
         self.transforms.insert(self.num_transforms, transform);
         self.num_transforms += 1;
+        self.distribution = WeightedIndex::new(self.transforms.iter().map(|t| t.get_weight())).unwrap(); 
     }
 
-    fn choose_transform(&self) -> &Box<dyn Transform + Sync> {
+    fn choose_transform(&self) -> &TransformEnum {
         let mut rng = thread_rng();
-        let distribution = WeightedIndex::new(self.transforms.iter().map(|t| t.get_weight())).unwrap(); 
-        self.transforms.get(distribution.sample(&mut rng)).unwrap()
+        self.transforms.get(self.distribution.sample(&mut rng)).unwrap()
     }   
 
     pub fn evaluate(&self, image: &mut Image, num_points: usize, num_iterations: usize) {
