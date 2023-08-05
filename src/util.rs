@@ -1,8 +1,9 @@
 use rand::prelude::*;
-use num_complex::Complex32;
+use num::complex::Complex32;
 use serde::{Serialize, Deserialize};
+use std::default::Default;
 
-#[derive(Copy, Clone, Serialize, Deserialize)]
+#[derive(Copy, Clone, Serialize, Deserialize, Debug)]
 pub struct Color {
     pub r: f32, 
     pub g: f32, 
@@ -10,7 +11,7 @@ pub struct Color {
 }
 
 impl Color {
-    pub fn random() -> Color {
+    pub fn random() -> Self {
         let mut rng = rand::thread_rng();
         Color {
             r: rng.gen::<f32>(),
@@ -18,6 +19,12 @@ impl Color {
             b: rng.gen::<f32>()
         }
 
+    }
+}
+
+impl Default for Color {
+    fn default() -> Self {
+        Color::random()
     }
 }
 

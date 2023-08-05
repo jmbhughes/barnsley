@@ -1,10 +1,13 @@
 use std::f32::consts::PI;
-use num_complex::{Complex, Complex32};
+use std::fmt;
+use std::default::Default;
+use num::complex::{Complex, Complex32};
 use rand::prelude::*;
 use rand_distr::{Normal, Distribution};
 use crate::util::*;
 use enum_dispatch::enum_dispatch;
-
+use serde::{Serialize, Deserialize};
+use strum_macros::EnumString;
 
 pub fn _final_transform(x: f32, y: f32) -> (f32, f32) {
     let a = 0.5;
@@ -18,11 +21,30 @@ pub fn _final_transform(x: f32, y: f32) -> (f32, f32) {
 }
 
 #[enum_dispatch]
+#[derive(Serialize, Deserialize, Copy, Clone, EnumString, Debug)]
 pub enum TransformEnum {
     LinearTransform,
     AffineTransform,
     InverseJuliaTransform,
     MoebiusTransform,
+}
+
+impl fmt::Display for TransformEnum {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{:?}", self)
+    }
+}
+
+impl TransformEnum {
+    pub fn random(&self) -> Self{
+        match self.get_name().as_str() {
+            "LinearTransform" => LinearTransform::random().into(),
+            "AffineTransform" => AffineTransform::random().into(),
+            "InverseJuliaTransform" => InverseJuliaTransform::random().into(),
+            "MoebiusTransform" => MoebiusTransform::random().into(),
+            _ => {panic!("Cannot call random on undefined transform")}
+        }
+    }
 }
 
 
@@ -38,8 +60,10 @@ pub trait Transform{
     }
     fn transform_point(&self, point: Point) -> Point;
     fn get_weight(&self) -> f32;
+    fn get_name(&self) -> String;
 }
 
+#[derive(Serialize, Deserialize, Copy, Clone, Debug)]
 pub struct LinearTransform {
     a: f32,
     b: f32, 
@@ -65,6 +89,12 @@ impl LinearTransform {
     }
 }
 
+impl Default for LinearTransform {
+    fn default() -> Self {
+        LinearTransform::random()
+    }
+}
+
 impl Transform for LinearTransform {
     fn transform_point(&self, point: Point) -> Point {
         Point{x: self.a * point.x + self.b * point.y, 
@@ -79,8 +109,13 @@ impl Transform for LinearTransform {
     fn get_base_color(&self) -> Color {
         self.base_color
     }
+
+    fn get_name(&self) -> String {
+        "LinearTransform".to_string()
+    }
 }
 
+#[derive(Serialize, Deserialize, Copy, Clone, Debug)]
 pub struct AffineTransform{
     a: f32,
     b: f32, 
@@ -113,6 +148,12 @@ impl AffineTransform {
     }
 }
 
+impl Default for AffineTransform {
+    fn default() -> Self {
+        AffineTransform::random()
+    }
+}
+
 impl Transform for AffineTransform {
     fn transform_point(&self, point: Point) -> Point {
         Point{x: self.a * point.x + self.b * point.y + self.xshift, 
@@ -127,8 +168,13 @@ impl Transform for AffineTransform {
     fn get_base_color(&self) -> Color {
         self.base_color
     }
+
+    fn get_name(&self) -> String {
+        "AffineTransform".to_string()
+    }
 }
 
+#[derive(Serialize, Deserialize, Copy, Clone, Debug)]
 pub struct MoebiusTransform{
     a: Complex<f32>,
     b: Complex32, 
@@ -159,6 +205,12 @@ impl MoebiusTransform {
     }
 }
 
+impl Default for MoebiusTransform {
+    fn default() -> Self {
+        MoebiusTransform::random()
+    }
+}
+
 impl Transform for MoebiusTransform {
     fn transform_point(&self, point: Point) -> Point {
         let z = Complex32{re: point.x, im: point.y};
@@ -173,8 +225,13 @@ impl Transform for MoebiusTransform {
     fn get_base_color(&self) -> Color {
         self.base_color
     }
+
+    fn get_name(&self) -> String {
+        "MoebiusTransform".to_string()
+    }
 }
 
+#[derive(Serialize, Deserialize, Copy, Clone, Debug)]
 pub struct InverseJuliaTransform{
     r: f32,
     theta: f32, 
@@ -202,6 +259,12 @@ impl InverseJuliaTransform {
     }
 }
 
+impl Default for InverseJuliaTransform {
+    fn default() -> Self {
+        InverseJuliaTransform::random()
+    }
+}
+
 impl Transform for InverseJuliaTransform {
     fn transform_point(&self, point: Point) -> Point {
         let z = Complex32{re: point.x, im: point.y};
@@ -217,6 +280,10 @@ impl Transform for InverseJuliaTransform {
 
     fn get_base_color(&self) -> Color {
         self.base_color
+    }
+
+    fn get_name(&self) -> String {
+        "InverseJuliaTransform".to_string()
     }
 }
 

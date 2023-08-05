@@ -1,27 +1,63 @@
-use barnsley::transform::*;
-use barnsley::ifs::IFS;
-use barnsley::image::Image;
+use barnsley::config::*;
+use barnsley::template::*;
+use clap::{Parser, Subcommand};
+use std::fs::File;
+use std::io::Read;
+use serde_json;
+use toml;
 
-
-fn main() {    
-    let t0: TransformEnum = MoebiusTransform::random().into();
-    let t1: TransformEnum = MoebiusTransform::random().into();
-    let t2: TransformEnum = InverseJuliaTransform::random().into();
-    let t3: TransformEnum = InverseJuliaTransform::random().into();
-    let t4: TransformEnum = AffineTransform::random().into();
-
-    let mut my_ifs = IFS::new();
-    my_ifs.add_transform(t0);
-    my_ifs.add_transform(t1);
-    my_ifs.add_transform(t2);
-    my_ifs.add_transform(t3);
-    my_ifs.add_transform(t4);
-
-    let num_points = 10000;
-    let num_iterations = 1000;
-
-    let mut image = Image::new(512, 512);
-    my_ifs.evaluate(&mut image, num_points, num_iterations);
-    image.save("example_test.png", 1.max((num_points * num_iterations) / (image.height() * image.width())));
+#[derive(Parser)]
+#[command(author, version, about, long_about = None)]
+#[command(propagate_version = true)]
+struct Cli {
+    #[command(subcommand)]
+    command: Commands,
 }
 
+#[derive(Subcommand)]
+enum Commands {
+    /// Generates a config from a template
+    Generate { template_path: String },
+    /// Evaluates a config file
+    Evaluate { config_path: String},
+    /// Generates a config from a template and evaluates it, combo of generate and evaluate
+    Construct { template_path: String}
+}
+
+fn load_template(template_path: &String) -> Template{
+    let mut file = File::open(template_path).unwrap();
+    let mut data = String::new();
+    file.read_to_string(&mut data).unwrap();
+    toml::from_str(&data).unwrap()
+
+}
+
+fn load_config(config_path: &String) -> Config {
+    let mut file = File::open(config_path).unwrap();
+    let mut data = String::new();
+    file.read_to_string(&mut data).unwrap();
+    serde_json::from_str(&data).unwrap()
+
+}
+
+fn main() {
+    let cli = Cli::parse();
+
+    // You can check for the existence of subcommands, and if found use their
+    // matches just as you would the top level cmd
+    match &cli.command {
+        Commands::Generate { template_path } => {
+            let config = load_template(template_path).generate();
+            println!("{}", serde_json::to_string(&config).unwrap());
+        },
+        Commands::Evaluate { config_path } => {
+            let config = load_config(config_path);
+            config.run();
+        },
+        Commands::Construct { template_path } => {
+            let config = load_template(template_path).generate();
+            println!("{}", serde_json::to_string(&config).unwrap());        
+            config.run();
+        }
+    }
+}

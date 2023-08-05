@@ -1,33 +1,40 @@
-use toml;
 use serde::{Serialize, Deserialize};
+use crate::transform::*;
+use crate::ifs::*;
+use crate::image::Image;
 
 #[derive(Serialize, Deserialize)]
-struct Config {
-   image_settings: ImageSettings,
-   evaluation_settings: EvaluationSettings,
-   tranform_serializations: Vec<String>,
+pub struct Config {
+   pub image_settings: ImageSettings,
+   pub evaluation_settings: EvaluationSettings,
+   pub transforms: Vec<TransformEnum>,
 }
 
-#[derive(Serialize, Deserialize)]
-struct ImageSettings {
-   width: u32,
-   height: u32,
-   path: String
+impl Config {
+   pub fn run(&self) {
+      let mut ifs = IFS::new();
+      for tranform in self.transforms.iter() {
+         ifs.add_transform(*tranform);
+      }
+
+    let num_points = self.evaluation_settings.num_points as usize;
+    let num_iterations = self.evaluation_settings.num_iterations as usize;
+
+    let mut image = Image::new(self.image_settings.width as usize, self.image_settings.height as usize);
+    ifs.evaluate(&mut image, num_points, num_iterations);
+    image.save(&self.image_settings.path, 1.max((num_points * num_iterations) / (image.height() * image.width())));
+   }
 }
 
-#[derive(Serialize, Deserialize)]
-struct EvaluationSettings {
-   iterations: u32,
-   num_points: u32,
+#[derive(Serialize, Deserialize, Clone)]
+pub struct ImageSettings {
+   pub width: u32,
+   pub height: u32,
+   pub path: String
 }
 
-pub fn test() {
-    let my_config: Config = Config {
-        image_settings: ImageSettings { width: 512, height: 512, path: "test.png".to_string() },
-        evaluation_settings: EvaluationSettings { iterations: 10000, num_points: 1000 },
-        tranform_serializations: vec!["test".to_string()] // LinearTransform::random().to_string()]
-    };
-
-    let serialized_config: String = toml::to_string(&my_config).unwrap();
-    println!("{}", serialized_config);
+#[derive(Serialize, Deserialize, Copy, Clone)]
+pub struct EvaluationSettings {
+   pub num_iterations: u32,
+   pub num_points: u32,
 }
