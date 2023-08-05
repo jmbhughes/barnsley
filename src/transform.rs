@@ -1,8 +1,7 @@
 use std::f32::consts::PI;
-use serde::{Serialize, Deserialize, de::DeserializeOwned};
 use num_complex::{Complex, Complex32};
 use rand::prelude::*;
-use rand_distr::{Normal, Distribution, num_traits::FloatConst};
+use rand_distr::{Normal, Distribution};
 use crate::util::*;
 use enum_dispatch::enum_dispatch;
 

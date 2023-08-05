@@ -1,10 +1,6 @@
-use num_complex::Complex32;
 use rand::prelude::*;
 use rand::distributions::WeightedIndex;
-use ndarray::Array3;
-use image::{RgbImage, ImageBuffer, Rgb};
-use rand_distr::{Normal, Distribution};
-
+use rand_distr::Distribution;
 use crate::util::*;
 use crate::transform::*;
 use crate::image::*;
@@ -37,7 +33,9 @@ impl IFS{
     }   
 
     pub fn evaluate(&self, image: &mut Image, num_points: usize, num_iterations: usize) {
-        (0..num_points).into_iter().for_each(|v| self._single_point_evaluation(image, num_iterations))
+        for _ in 0..num_points {
+            self._single_point_evaluation(image, num_iterations)
+        }
     }
 
     fn _single_point_evaluation(&self, image: &mut Image, num_iterations: usize) {

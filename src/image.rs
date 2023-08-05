@@ -1,6 +1,5 @@
-use num_complex::Complex32;
 use ndarray::Array3;
-use image::{RgbImage, ImageBuffer, Rgb};
+use image::RgbImage;
 use crate::util::*;
 
 const RGB_LUMINANCE: [f32; 3] = [0.2126, 0.7152, 0.0722];
@@ -44,7 +43,7 @@ impl Image {
                 let mut lum = self.data[[x, y, 0]] * RGB_LUMINANCE[0];
                 lum += self.data[[x, y, 1]] * RGB_LUMINANCE[1];
                 lum += self.data[[x, y, 2]] * RGB_LUMINANCE[2];
-                lum /= (iterations as f32);
+                lum /= iterations as f32;
 
                 sum_of_logs += (lum.max(0.0001)).log10();
                 // sum_of_logs += log10f32()
@@ -65,7 +64,8 @@ impl Image {
         let image = pixels.map(|v| ((v * 255.0 + 0.5) as u8).max(0).min(255));
         let buffer = array_to_image(image); 
         
-        buffer.save(filename);
+        let _ = buffer.save(filename);
+
     }
 }
 

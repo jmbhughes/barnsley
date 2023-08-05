@@ -1,7 +1,6 @@
 use barnsley::transform::*;
 use barnsley::ifs::IFS;
 use barnsley::image::Image;
-use barnsley::config::test;
 
 
 fn main() {    
