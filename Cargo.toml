@@ -10,6 +10,7 @@ repository = "https://github.com/jmbhughes/barnsley"
 keywords = ["image generation", "iterated function", "ifs", "mathematical images"]
 categories = ["mathematics", "multimedia::images", "rendering"]
 readme = "README.md"
+exclude = ["examples/"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
