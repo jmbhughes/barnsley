@@ -1,3 +1,5 @@
+//! two-dimensional image representation
+
 use ndarray::Array3;
 use image::RgbImage;
 use crate::util::*;
