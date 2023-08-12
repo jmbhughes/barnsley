@@ -1,8 +1,11 @@
+//! core definition for an IFS run that can be serialized to a file
+
 use serde::{Serialize, Deserialize};
 use crate::transform::*;
 use crate::ifs::*;
 use crate::image::Image;
 
+/// Configs are used to define an IFS run: the image settings used, the evaluation settings, and the transforms. 
 #[derive(Serialize, Deserialize)]
 pub struct Config {
    pub image_settings: ImageSettings,
@@ -26,15 +29,22 @@ impl Config {
    }
 }
 
+/// Configuration of the image in an IFS run
 #[derive(Serialize, Deserialize, Clone)]
 pub struct ImageSettings {
+   /// how wide in pixels the generated image will be
    pub width: u32,
+   /// how tall in pixels the generated image will be
    pub height: u32,
+   /// where to save the image
    pub path: String
 }
 
+/// Configuration of the evaluation of an IFS run
 #[derive(Serialize, Deserialize, Copy, Clone)]
 pub struct EvaluationSettings {
+   /// how many iterations each point is evaluated for
    pub num_iterations: u32,
+   /// how many points are passed through the IFS
    pub num_points: u32,
 }

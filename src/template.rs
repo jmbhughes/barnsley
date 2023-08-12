@@ -1,3 +1,5 @@
+//! representation of an non-parameterized, random IFS
+
 use std::str::FromStr;
 use serde::{Serialize, Deserialize};
 use crate::transform::*;

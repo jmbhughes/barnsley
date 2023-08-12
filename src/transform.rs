@@ -1,3 +1,16 @@
+//! functions used in the IFS
+//! 
+//! # Adding a new transform
+//! 
+//! It's recommended to look at a simple transform's implementation before adding a new one. 
+//! For example, look at `LinearTransform` to understand what each part does. 
+//! 
+//! 1. Create a struct to store the transforms parameters. It should have a `base_color` and `weight` too. 
+//! 2. Derive `Serialize, Deserialize, Copy, Clone, Debug` for the new transform struct.
+//! 3. Implement the `transform` trait for that struct.
+//! 4. Add the transform to the `TransformEnum` enum. 
+//! 5. Add the random generation for `TransformEnum::random`. 
+
 use std::f32::consts::PI;
 use std::fmt;
 use std::default::Default;
@@ -9,7 +22,8 @@ use enum_dispatch::enum_dispatch;
 use serde::{Serialize, Deserialize};
 use strum_macros::EnumString;
 
-pub fn _final_transform(x: f32, y: f32) -> (f32, f32) {
+/// Use to map a point (x,y) to image space. 
+pub fn final_transform(x: f32, y: f32) -> (f32, f32) {
     let a = 0.5;
     let b = 0.0;
     let c = 0.0; 
@@ -48,21 +62,35 @@ impl TransformEnum {
 }
 
 
+/// All transforms must have this trait
 #[enum_dispatch(TransformEnum)]
 pub trait Transform{
+    /// Gets the transforms base color, i.e. the color of the transform that gets repeatedly mixed
     fn get_base_color(&self) -> Color;
+
+    /// Transform a color using the `base_color` and the `current_color`. 
     fn transform_color(&self, current_color: Color) -> Color {
         let base_color = self.get_base_color();
-        Color{r: (base_color.r + current_color.r) / 3.0,
-              g: (base_color.g + current_color.g) / 3.0,
-              b: (base_color.b + current_color.b) / 3.0
+        Color{r: (base_color.r + current_color.r) / 2.0,
+              g: (base_color.g + current_color.g) / 2.0,
+              b: (base_color.b + current_color.b) / 2.0
         }
     }
+
+    /// Applies the transformation to a point
     fn transform_point(&self, point: Point) -> Point;
+
+    /// Retreives the transforms weight
     fn get_weight(&self) -> f32;
+
+    /// Retrieves the name of the transformed, used by `TransformEnum::random`
     fn get_name(&self) -> String;
 }
 
+// LINEAR TRANSFORM
+/// LinearTransform defined by the matrix:
+/// [a b]
+/// [c d]
 #[derive(Serialize, Deserialize, Copy, Clone, Debug)]
 pub struct LinearTransform {
     a: f32,
@@ -115,6 +143,7 @@ impl Transform for LinearTransform {
     }
 }
 
+// AFFINE TRANSFORM
 #[derive(Serialize, Deserialize, Copy, Clone, Debug)]
 pub struct AffineTransform{
     a: f32,
@@ -174,6 +203,7 @@ impl Transform for AffineTransform {
     }
 }
 
+// MOEBIUS TRANSFORM
 #[derive(Serialize, Deserialize, Copy, Clone, Debug)]
 pub struct MoebiusTransform{
     a: Complex<f32>,
@@ -230,6 +260,8 @@ impl Transform for MoebiusTransform {
         "MoebiusTransform".to_string()
     }
 }
+
+// INVERSE JULIA TRANSFORM
 
 #[derive(Serialize, Deserialize, Copy, Clone, Debug)]
 pub struct InverseJuliaTransform{

@@ -1,11 +1,11 @@
 [package]
 name = "barnsley"
-version = "0.1.1"
+version = "0.1.4"
 edition = "2021"
 authors = ["Marcus Hughes <hughes.jmb@gmail.com>"]
 license = "MIT OR Apache-2.0"
 description = "iterated function system image generator"
-# documentation = "https://docs.rs/barnsley/latest/"
+documentation = "https://docs.rs/barnsley/latest/"
 repository = "https://github.com/jmbhughes/barnsley"
 keywords = ["image-generation", "iterated-function", "ifs", "mathematical-images"]
 categories = ["mathematics", "multimedia::images", "rendering"]
