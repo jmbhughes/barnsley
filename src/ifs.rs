@@ -30,7 +30,9 @@ impl IFS{
     /// Add a transform to the IFS
     /// 
     /// ```rust
-    /// let my_ifs = IFS::new();
+    /// use barnsley::{transform::AffineTransform, ifs::IFS};
+    /// 
+    /// let mut my_ifs = IFS::new();
     /// my_ifs.add_transform(AffineTransform::random().into());
     /// ```
     pub fn add_transform<'a>(&mut self, transform: TransformEnum) {
@@ -49,10 +51,12 @@ impl IFS{
     /// Evaluate a transform 
     /// 
     /// ```rust
-    /// let my_ifs = IFS::new();
+    /// use barnsley::{ifs::IFS, transform::AffineTransform, image::Image};
+    /// 
+    /// let mut my_ifs = IFS::new();
     /// my_ifs.add_transform(AffineTransform::random().into());
     /// let mut image = Image::new(1000, 1000);
-    /// my_ifs.evaluate(image, 1000, 1000);
+    /// my_ifs.evaluate(&mut image, 1000, 1000);
     /// ```
     pub fn evaluate(&self, image: &mut Image, num_points: usize, num_iterations: usize) {
         for _ in 0..num_points {

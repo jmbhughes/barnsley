@@ -11,13 +11,14 @@
 //! ## Defining an iterated function system
 //! An iterated function is defined by a vector of transforms. You add them one at a time. 
 //! ```rust
+//! use barnsley::{ifs::IFS, transform::AffineTransform, image::Image};
 //! let mut ifs = IFS::new();
 //! ifs.add_transform(AffineTransform::random().into());
 //! 
-//! let width: usize = 1000;
-//! let height: usize = 1000;
-//! let num_points: usize = 10000;
-//! let num_iterations: usize = 1000;
+//! let width: usize = 100;
+//! let height: usize = 100;
+//! let num_points: usize = 100;
+//! let num_iterations: usize = 10;
 //! let mut image = Image::new(width, height);
 //! ifs.evaluate(&mut image, num_points, num_iterations);
 //! ```
