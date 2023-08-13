@@ -38,7 +38,6 @@ fn load_template(template_path: &String) -> Template{
     let mut data = String::new();
     file.read_to_string(&mut data).unwrap();
     toml::from_str(&data).unwrap()
-
 }
 
 fn load_config(config_path: &String) -> Config {
@@ -46,8 +45,8 @@ fn load_config(config_path: &String) -> Config {
     let mut data = String::new();
     file.read_to_string(&mut data).unwrap();
     serde_json::from_str(&data).unwrap()
-
 }
+
 
 fn main() {
     let cli = Cli::parse();
@@ -89,8 +88,8 @@ fn run_gui() -> Result<(), eframe::Error> {
     let mut my_image = Image::new(width, height);
 
     let mut my_ifs = IFS::new();
-    my_ifs.add_transform(AffineTransform::random().into());
-    my_ifs.add_transform(MoebiusTransform::random().into());
+    my_ifs.add_transform(Box::new(AffineTransform::random()));
+    my_ifs.add_transform(Box::new(MoebiusTransform::random()));
 
     let num_points = 1000;
     let num_iterations = 1000;
@@ -115,8 +114,8 @@ fn run_gui() -> Result<(), eframe::Error> {
             if ui.button("Click me").clicked() {
                 my_image.clear();
                 my_ifs = IFS::new();
-                my_ifs.add_transform(AffineTransform::random().into());
-                my_ifs.add_transform(MoebiusTransform::random().into());
+                my_ifs.add_transform(Box::new(AffineTransform::random()));
+                my_ifs.add_transform(Box::new(MoebiusTransform::random()));
                 my_ifs.evaluate(&mut my_image, num_points, num_iterations);
 
             }

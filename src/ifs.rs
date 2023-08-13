@@ -9,7 +9,7 @@ use crate::image::*;
 /// Iterated function system
 pub struct IFS {
     /// transforms used in the iterated function system
-    transforms: Vec<TransformEnum>,
+    transforms: Vec<Box<dyn Transform>>,
     /// the number of transforms in the IFS, stored for efficiency
     num_transforms: usize,
     /// the total weight of all the transforms in the IFS, stored for efficiency
@@ -35,7 +35,7 @@ impl IFS{
     /// let mut my_ifs = IFS::new();
     /// my_ifs.add_transform(AffineTransform::random().into());
     /// ```
-    pub fn add_transform<'a>(&mut self, transform: TransformEnum) {
+    pub fn add_transform<'a>(&mut self, transform: Box<dyn Transform>) {
         self.total_weight += transform.get_weight();
         self.transforms.insert(self.num_transforms, transform);
         self.num_transforms += 1;
@@ -43,9 +43,10 @@ impl IFS{
     }
 
     /// Select a transform at random according to the weighting 
-    fn choose_transform(&self) -> &TransformEnum {
+    fn choose_transform(&self) -> &Box<dyn Transform> {
         let mut rng = thread_rng();
         self.transforms.get(self.distribution.sample(&mut rng)).unwrap()
+        //self.transforms.get(self.distribution.sample(&mut rng)).unwrap()
     }   
 
     /// Evaluate a transform 
