@@ -21,6 +21,10 @@ impl Image {
         }
     }
 
+    pub fn clear(&mut self) {
+        self.data = Array3::zeros((self.width(), self.height(), 3));
+    }
+
     pub fn width(&self) -> usize {
         self.data.shape()[0]
     }
@@ -68,6 +72,11 @@ impl Image {
         
         let _ = buffer.save(filename);
 
+    }
+
+    pub fn to_u8(&self, iterations: usize) -> Array3<u8> {
+        self.get_gamma_corrected_pixels(iterations)
+            .map(|v| ((v * 255.0 + 0.5) as u8).max(0).min(255))
     }
 }
 
