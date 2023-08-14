@@ -9,13 +9,13 @@ use crate::image::Image;
 pub struct Config {
    pub image_settings: ImageSettings,
    pub evaluation_settings: EvaluationSettings,
-   pub transforms: Vec<Box<dyn Transform>>
+   pub transforms: Vec<Transforms>
 }
 
 impl Config{
    pub fn run(self) {
       let mut ifs = IFS::new();
-            
+
       for transform in self.transforms.into_iter() {
          ifs.add_transform(transform);
       }

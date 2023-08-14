@@ -4,7 +4,8 @@ use barnsley::config::*;
 use barnsley::ifs::IFS;
 use barnsley::image::Image;
 use barnsley::template::*;
-use barnsley::transform::{AffineTransform, MoebiusTransform};
+use barnsley::transform::{AffineTransform, MoebiusTransform, Transforms};
+use barnsley::animation::AnimationSequence;
 use clap::{Parser, Subcommand};
 use std::fs::File;
 use std::io::Read;
@@ -87,15 +88,22 @@ fn run_gui() -> Result<(), eframe::Error> {
     let height = 500;
     let mut my_image = Image::new(width, height);
 
-    let mut my_ifs = IFS::new();
-    my_ifs.add_transform(Box::new(AffineTransform::random()));
-    my_ifs.add_transform(Box::new(MoebiusTransform::random()));
+    let mut start = IFS::new();
+    start.add_transform(Transforms::Affine(AffineTransform::random()));
+    start.add_transform(Transforms::Moebius(MoebiusTransform::random()));
+
+    let mut end: IFS = IFS::new();
+    end.add_transform(Transforms::Affine(AffineTransform::random()));
+    end.add_transform(Transforms::Moebius(MoebiusTransform::random()));
+
+    let seq = AnimationSequence{ifs_vec: vec![start, end], step_counts: vec![10]};
 
     let num_points = 1000;
     let num_iterations = 1000;
-    my_ifs.evaluate(&mut my_image, num_points, num_iterations);
+    let img_sequence = seq.animate(width, height, num_iterations, num_points); // my_ifs.evaluate(&mut my_image, num_points, num_iterations);
     // let data = my_image.to_u8(1.max((num_points * num_iterations) / (my_image.height() * my_image.width()))).as_slice().unwrap().to_owned();
 
+    let mut current_image = 0; 
     eframe::run_simple_native("Barnsley", options, move |ctx, _frame| {
         egui::CentralPanel::default().show(ctx, |ui| {
             ui.heading("Barnsley test"); 
@@ -104,7 +112,7 @@ fn run_gui() -> Result<(), eframe::Error> {
                 // Load the texture only once.
                 &ui.ctx().load_texture(
                     "my-image",
-                    egui::ColorImage::from_rgb([width, height], my_image.to_u8(1.max((num_points * num_iterations) / (my_image.height() * my_image.width()))).as_slice().unwrap()),
+                    egui::ColorImage::from_rgb([width, height], img_sequence.get(current_image).unwrap().to_u8(1.max((num_points * num_iterations) / (my_image.height() * my_image.width()))).as_slice().unwrap()),
                     Default::default()
                 )
             };
@@ -112,33 +120,9 @@ fn run_gui() -> Result<(), eframe::Error> {
             ui.image(texture, texture.size_vec2());
 
             if ui.button("Click me").clicked() {
-                my_image.clear();
-                my_ifs = IFS::new();
-                my_ifs.add_transform(Box::new(AffineTransform::random()));
-                my_ifs.add_transform(Box::new(MoebiusTransform::random()));
-                my_ifs.evaluate(&mut my_image, num_points, num_iterations);
-
+                //my_image.clear();
+                current_image += 1;
             }
         });
     })
-}
-
-struct MyImage {
-    texture: Option<egui::TextureHandle>,
-}
-
-impl MyImage {
-    fn ui(&mut self, ui: &mut egui::Ui) {
-        let texture: &egui::TextureHandle = self.texture.get_or_insert_with(|| {
-            // Load the texture only once.
-            ui.ctx().load_texture(
-                "my-image",
-                egui::ColorImage::example(),
-                Default::default()
-            )
-        });
-
-        // Show the image:
-        ui.image(texture, texture.size_vec2());
-    }
 }

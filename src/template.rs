@@ -13,7 +13,7 @@ pub struct Template {
 
 impl Template {
     pub fn generate(&self) -> Config {
-        let mut transforms: Vec<Box<dyn Transform>> = vec![];
+        let mut transforms: Vec<Transforms> = vec![];
         for transform_name in self.random_transforms.clone() {
             transforms.insert(transforms.len(), transform_from_str(transform_name));
         }
