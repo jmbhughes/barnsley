@@ -123,7 +123,7 @@ impl IFS{
                     let a = *self.transforms.get(i).unwrap();
                     let b = *other.transforms.get(i).unwrap();
                     let new = a.morph(b, pct);
-                   out.add_transform(new);
+                    out.add_transform(new);
                }
                out
            }

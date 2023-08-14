@@ -21,7 +21,7 @@ pub fn lerp(a: Parameter, b: Parameter, pct: f32) -> Parameter {
 
 /// lerp between two floats
 pub fn lerp_f32(a: f32, b: f32, pct: f32) -> f32 {
-    a * pct + b * (1.0 - pct)
+    a * (1.0 - pct) + b * pct
 }
 
 /// lerp between two complex
