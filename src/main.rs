@@ -1,18 +1,12 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")] // hide console window on Windows in release
 
 use barnsley::config::*;
-use barnsley::ifs::IFS;
-use barnsley::image::Image;
 use barnsley::template::*;
-use barnsley::transform::{AffineTransform, MoebiusTransform, Transforms, InverseJuliaTransform};
-use barnsley::animation::AnimationSequence;
 use clap::{Parser, Subcommand};
 use std::fs::File;
 use std::io::Read;
 use serde_json;
 use toml;
-use eframe::egui;
-
 
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]
@@ -29,9 +23,7 @@ enum Commands {
     /// Evaluates a config file
     Evaluate { config_path: String},
     /// Generates a config from a template and evaluates it, combo of generate and evaluate
-    Construct { template_path: String},
-    /// Runs the GUI
-    GUI
+    Construct { template_path: String}
 }
 
 fn load_template(template_path: &String) -> Template{
@@ -67,90 +59,6 @@ fn main() {
             let config = load_template(template_path).generate();
             println!("{}", serde_json::to_string(&config).unwrap());        
             config.run();
-        },
-        Commands::GUI => {
-            run_gui();
         }
     }
-}
-
-
-
-fn run_gui() -> Result<(), eframe::Error> {
-    env_logger::init(); // Log to stderr (if you run with `RUST_LOG=debug`).
-
-    let options = eframe::NativeOptions {
-        initial_window_size: Some(egui::vec2(1200.0, 800.0)),
-        ..Default::default()
-    };
-
-    let width = 500;
-    let height = 500;
-
-    let mut start = IFS::new();
-    start.add_transform(Transforms::Affine(AffineTransform::random()));
-    start.add_transform(Transforms::Moebius(MoebiusTransform::random()));
-    start.add_transform(Transforms::InverseJulia(InverseJuliaTransform::random()));
-
-    let mut middle = IFS::new();
-    middle.add_transform(Transforms::Affine(AffineTransform::random()));
-    middle.add_transform(Transforms::Moebius(MoebiusTransform::random()));
-    middle.add_transform(Transforms::InverseJulia(InverseJuliaTransform::random()));
-
-
-    let mut third = IFS::new();
-    third.add_transform(Transforms::Affine(AffineTransform::random()));
-    third.add_transform(Transforms::Moebius(MoebiusTransform::random()));
-    third.add_transform(Transforms::InverseJulia(InverseJuliaTransform::random()));
-
-    let mut end: IFS = IFS::new();
-    end.add_transform(Transforms::Affine(AffineTransform::random()));
-    end.add_transform(Transforms::Moebius(MoebiusTransform::random()));
-    end.add_transform(Transforms::InverseJulia(InverseJuliaTransform::random()));
-
-    let step_counts = vec![10, 10, 10];
-    let total_steps: usize = step_counts.iter().sum();
-
-    let seq = AnimationSequence{ifs_vec: vec![start, middle, third, end], step_counts};
-
-    let num_points = 1000;
-    let num_iterations = 1000;
-    let img_sequence = seq.animate(width, height, num_iterations, num_points); // my_ifs.evaluate(&mut my_image, num_points, num_iterations);
-    // let data = my_image.to_u8(1.max((num_points * num_iterations) / (my_image.height() * my_image.width()))).as_slice().unwrap().to_owned();
-
-    let mut current_image = 0; 
-    eframe::run_simple_native("Barnsley", options, move |ctx, _frame| {
-        egui::SidePanel::left("name").show(ctx, |ui| {
-            ui.heading("test"); 
-            ui.collapsing("collapsible", |ui| {
-                ui.button("pushable?");
-            })
-        });
-        
-        egui::CentralPanel::default().show(ctx, |ui| {
-            ui.heading("Barnsley test"); 
-            
-            let texture: &egui::TextureHandle = { 
-                // Load the texture only once.
-                &ui.ctx().load_texture(
-                    "my-image",
-                    egui::ColorImage::from_rgb([width, height], img_sequence.get(current_image).unwrap().to_u8(1.max((num_points * num_iterations) / (width * height))).as_slice().unwrap()),
-                    Default::default()
-                )
-            };
-
-            ui.image(texture, texture.size_vec2());
-
-            if ui.button("<").clicked() {
-                current_image -= 1;
-            }
-
-            ui.label(current_image.to_string() + " of " + &(total_steps-1).to_string());
-
-            if ui.button(">").clicked() {
-                //my_image.clear();
-                current_image += 1;
-            }
-        });
-    })
 }

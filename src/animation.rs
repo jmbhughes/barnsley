@@ -1,4 +1,4 @@
-use crate::{ifs::IFS, transform::Transformable, image::Image};
+use crate::{ifs::IFS, image::Image};
 
 
 pub struct AnimationSequence {
