@@ -57,7 +57,6 @@ impl Transform {
 
 /// All transforms must have this trait
 #[enum_dispatch]
-//#[typetag::serde(tag = "type")]
 pub trait Transformable {
     /// Gets the transforms base color, i.e. the color of the transform that gets repeatedly mixed
     fn get_base_color(&self) -> Color;
@@ -80,27 +79,11 @@ pub trait Transformable {
 
     /// Retrieves the name of the transformed, used by `TransformEnum::random`
     fn get_name(&self) -> String;
-
-    // TODO: figure out how to require a morph
-    // fn morph_same(&self, other: &Self, pct: f32) -> Self;  
-    // fn morph_same(&self, other: Box<dyn Transform>, pct: f32) -> Box<dyn Transform>; 
-    //fn morph(&self, other: Box<&Self>, pct: f32) -> Box<Self> where Self:Sized;
-
 }
 
 pub trait Morphable<T: Transformable + ?Sized> {
     fn morph(&self, other: Box<&T>, pct: f32) -> Box<T>;
 }
-
-// pub fn transform_from_str(name: String) -> Box<Transforms> {
-//     match name.as_str() {
-//         "LinearTransform" => Box::new(LinearTransform::random()),
-//         "AffineTransform" => Box::new(AffineTransform::random()),
-//         "MoebiusTransform" => Box::new(MoebiusTransform::random()),
-//         "InverseJuliaTransform" => Box::new(InverseJuliaTransform::random()),
-//         _ => panic!("Not a supported transform kind")
-//     }
-// }
 
 pub fn transform_from_str(name: String) -> Transform {
     match name.as_str() {
@@ -172,7 +155,6 @@ impl Default for LinearTransform {
     }
 }
 
-// #[typetag::serde]
 impl Transformable for LinearTransform {
     fn transform_point(&self, point: Point) -> Point {
         Point {
@@ -205,21 +187,6 @@ impl Morphable<LinearTransform> for LinearTransform {
     }
 
 }
-    
-    // fn morph_same(&self,other: &Self, pct: f32) -> Self{
-    //     LinearTransform::new(
-    //         lerp_f32(self.a, other.a, pct),
-    //         lerp_f32(self.b, other.b, pct),
-    //         lerp_f32(self.c, other.c, pct),
-    //         lerp_f32(self.d, other.d, pct),
-    //         lerp_color(self.base_color, other.base_color, pct),
-    //         lerp_f32(self.weight, other.weight, pct))
-    // }
-
-    // fn morph_same<T: Transform>(&self,other:&T) -> &T{
-    //     T::random()
-    // }
-
 
 // AFFINE TRANSFORM
 #[derive(Serialize, Deserialize, Copy, Clone, Debug)]
@@ -302,7 +269,6 @@ impl Default for AffineTransform {
     }
 }
 
-// #[typetag::serde]
 impl Transformable for AffineTransform {
     fn transform_point(&self, point: Point) -> Point {
         Point {
@@ -336,9 +302,6 @@ impl Morphable<AffineTransform> for AffineTransform {
                     lerp_color(self.base_color, other.base_color, pct),
                     lerp_f32(self.weight, other.weight, pct)))
     }
-    // fn morph_same(&self,other:&Self) -> &Self{
-    //     &AffineTransform::random()
-    // }
 }
 
 // MOEBIUS TRANSFORM
@@ -443,9 +406,6 @@ impl Morphable<MoebiusTransform> for MoebiusTransform {
                     lerp_color(self.base_color, other.base_color, pct),
                     lerp_f32(self.weight, other.weight, pct)))
     }
-    // fn morph_same(&self,other:&Self) -> &Self {
-    //     &MoebiusTransform::random()
-    // }
 }
 
 // INVERSE JULIA TRANSFORM
@@ -499,7 +459,6 @@ impl Default for InverseJuliaTransform {
     }
 }
 
-// #[typetag::serde]
 impl Transformable for InverseJuliaTransform {
 
     fn transform_point(&self, point: Point) -> Point {
@@ -538,7 +497,4 @@ impl Morphable<InverseJuliaTransform> for InverseJuliaTransform {
                     lerp_color(self.base_color, other.base_color, pct),
                     lerp_f32(self.weight, other.weight, pct)))
     }
-    // fn morph_same(&self,other:&Self) -> &Self {
-    //     &InverseJuliaTransform::random()
-    // }
 }
