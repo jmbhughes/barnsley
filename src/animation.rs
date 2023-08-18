@@ -7,6 +7,41 @@ pub struct AnimationSequence {
 }
 
 impl AnimationSequence {
+    fn determine_current_pair_index(&self, current_step: usize) -> usize {
+        let mut pair_index = 0;
+        let mut accumulator = 0;
+        while accumulator < current_step {
+            accumulator += self.step_counts.get(pair_index).expect("current_step exceeds total step count.");
+            pair_index += 1;
+        }
+        pair_index - 1
+    }
+
+    fn determine_current_pct(&self, current_step: usize, pair_index: usize) -> f32{
+        let mut current_pair = 0;
+        let mut accumulator = 0;
+        while current_pair < pair_index {
+            accumulator += self.step_counts.get(current_pair).expect("current_step exceeds total step count.");
+            current_pair += 1;
+        }
+        let this_pair_steps = current_step - accumulator;
+        this_pair_steps as f32 / *self.step_counts.get(pair_index).unwrap() as f32
+    }
+
+    pub fn animate_single_step(&self, width: usize, height: usize, 
+        num_iterations: usize, num_points: usize, current_step: usize) -> Image {
+            let pair_index = self.determine_current_pair_index(current_step);
+
+            let start = self.ifs_vec.get(pair_index).unwrap();
+            let end = self.ifs_vec.get(pair_index + 1).unwrap();
+            let pct = self.determine_current_pct(current_step, pair_index); 
+            let this_ifs = start.morph(end, pct);
+
+            let mut this_image = Image::new(width, height);
+            this_ifs.evaluate(&mut this_image, num_points, num_iterations);
+            this_image
+    }
+
     pub fn animate(&self, width: usize, height: usize, num_iterations: usize, num_points: usize) -> Vec<Image> {
         let mut images = vec![];
 
@@ -29,3 +64,44 @@ impl AnimationSequence {
     }
 }
 
+#[cfg(test)]
+mod tests {
+    use crate::{ifs::IFS, transform::AffineTransform, animation::AnimationSequence};
+
+    #[test]
+    fn test_determine_current_pair_index() {
+
+        let ifs1: IFS = IFS::new();
+        let ifs2: IFS = IFS::new();
+        let ifs3: IFS = IFS::new();
+        let ifs4: IFS = IFS::new();
+
+
+        let seq = AnimationSequence{ifs_vec: vec![ifs1, ifs2, ifs3, ifs4], 
+            step_counts: vec![100, 200, 300]};
+
+        assert_eq!(seq.determine_current_pair_index(30), 0);
+        assert_eq!(seq.determine_current_pair_index(100), 0);
+        assert_eq!(seq.determine_current_pair_index(101), 1);
+        assert_eq!(seq.determine_current_pair_index(101), 1);
+        assert_eq!(seq.determine_current_pair_index(305), 2);
+    }
+
+    #[test]
+    fn test_determine_current_pct() {
+
+        let ifs1: IFS = IFS::new();
+        let ifs2: IFS = IFS::new();
+        let ifs3: IFS = IFS::new();
+        let ifs4: IFS = IFS::new();
+
+
+        let seq = AnimationSequence{ifs_vec: vec![ifs1, ifs2, ifs3, ifs4], 
+            step_counts: vec![100, 200, 300]};
+
+        assert!((seq.determine_current_pct(30, 0) - 0.3).abs() < 0.01);
+        assert!((seq.determine_current_pct(101, 1) - 1.0/200.0).abs() < 0.01);
+        assert!((seq.determine_current_pct(201, 1) - 101.0/200.0).abs() < 0.01);
+
+    }
+}
