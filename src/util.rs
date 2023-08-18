@@ -1,23 +1,9 @@
 //! useful support functionality
 
-use num::complex::Complex32;
+use num::{complex::{Complex32}, FromPrimitive};
 use rand::prelude::*;
 use serde::{Deserialize, Serialize};
-use std::default::Default;
-
-
-pub enum Parameter {
-    F32(f32),
-    Complex32(Complex32)
-}
-
-pub fn lerp(a: Parameter, b: Parameter, pct: f32) -> Parameter {
-    match (a, b) {
-        (Parameter::F32(a), Parameter::F32(b)) => Parameter::F32(lerp_f32(a, b, pct)),
-        (Parameter::Complex32(a), Parameter::Complex32(b)) => Parameter::Complex32(lerp_complex32(a, b, pct)),
-        _ => panic!("a and b must have the same type to lerp.")
-    }
-}
+use std::{default::Default, ops::{Add, Mul}};
 
 /// lerp between two floats
 pub fn lerp_f32(a: f32, b: f32, pct: f32) -> f32 {
@@ -55,6 +41,49 @@ impl Color {
             g: rng.gen::<f32>(),
             b: rng.gen::<f32>(),
         }
+    }
+}
+
+impl Add for Color {
+    type Output = Self;
+
+    fn add(self, rhs: Self) -> Self::Output {
+        Color {
+            r: (self.r + rhs.r).clamp(0.0, 1.0),
+            g: (self.g + rhs.g).clamp(0.0, 1.0),
+            b: (self.b + rhs.b).clamp(0.0, 1.0)
+        }
+    }
+}
+
+impl Mul for Color {
+    type Output = Self;
+
+    fn mul(self, rhs: Self) -> Self::Output {
+        Color {
+            r: self.r * rhs.r,
+            g: self.g * rhs.g,
+            b: self.b * rhs.b
+        }    }
+}
+
+impl FromPrimitive for Color {
+    fn from_i64(n: i64) -> Option<Self> {
+        Some(Color { r: (n as f32).clamp(0.0, 1.0),
+            g: (n as f32).clamp(0.0, 1.0),
+            b: (n as f32).clamp(0.0, 1.0)})
+    }
+
+    fn from_u64(n: u64) -> Option<Self> {
+        Some(Color { r: (n as f32).clamp(0.0, 1.0),
+            g: (n as f32).clamp(0.0, 1.0),
+            b: (n as f32).clamp(0.0, 1.0)})
+    }
+
+    fn from_f32(n: f32) -> Option<Self> {
+        Some(Color { r: (n as f32).clamp(0.0, 1.0),
+            g: (n as f32).clamp(0.0, 1.0),
+            b: (n as f32).clamp(0.0, 1.0)})
     }
 }
 
