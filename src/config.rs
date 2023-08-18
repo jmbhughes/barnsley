@@ -9,7 +9,7 @@ use crate::image::Image;
 pub struct Config {
    pub image_settings: ImageSettings,
    pub evaluation_settings: EvaluationSettings,
-   pub transforms: Vec<Transforms>
+   pub transforms: Vec<Transform>
 }
 
 impl Config{

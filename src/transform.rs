@@ -18,6 +18,7 @@ use rand_distr::{Distribution, Normal};
 use serde::{Deserialize, Serialize};
 use std::default::Default;
 use std::f32::consts::PI;
+use enum_dispatch::enum_dispatch;
 
 pub trait NewTrait: Transformable + Morphable<dyn Transformable> {}
 
@@ -33,64 +34,66 @@ pub fn final_transform(x: f32, y: f32) -> (f32, f32) {
     return (z2.re, z2.im);
 }
 
+#[enum_dispatch(Transformable)]
 #[derive(Serialize, Deserialize, Copy, Clone)]
-pub enum Transforms {
-    Linear(LinearTransform),
-    Affine(AffineTransform),
-    InverseJulia(InverseJuliaTransform),
-    Moebius(MoebiusTransform)
+pub enum Transform {
+    LinearTransform,
+    AffineTransform,
+    InverseJuliaTransform,
+    MoebiusTransform
 }
 
-impl Transforms {
+impl Transform {
     pub fn get_name(&self) -> String {
         match self {
-            Transforms::Linear(t) => t.get_name(),
-            Transforms::Affine(t) => t.get_name(),
-            Transforms::InverseJulia(t) => t.get_name(),
-            Transforms::Moebius(t) => t.get_name()
+            Transform::LinearTransform(t) => t.get_name(),
+            Transform::AffineTransform(t) => t.get_name(),
+            Transform::InverseJuliaTransform(t) => t.get_name(),
+            Transform::MoebiusTransform(t) => t.get_name()
         }
     }
 
     pub fn get_weight(&self) -> f32 {
         match self {
-            Transforms::Linear(t) => t.get_weight(),
-            Transforms::Affine(t) => t.get_weight(),
-            Transforms::InverseJulia(t) => t.get_weight(),
-            Transforms::Moebius(t) => t.get_weight()
+            Transform::LinearTransform(t) => t.get_weight(),
+            Transform::AffineTransform(t) => t.get_weight(),
+            Transform::InverseJuliaTransform(t) => t.get_weight(),
+            Transform::MoebiusTransform(t) => t.get_weight()
         }
     }
 
     pub fn transform_point(&self, p: Point) -> Point {
         match self {
-            Transforms::Linear(t) => t.transform_point(p),
-            Transforms::Affine(t) => t.transform_point(p),
-            Transforms::InverseJulia(t) => t.transform_point(p),
-            Transforms::Moebius(t) => t.transform_point(p)
+            Transform::LinearTransform(t) => t.transform_point(p),
+            Transform::AffineTransform(t) => t.transform_point(p),
+            Transform::InverseJuliaTransform(t) => t.transform_point(p),
+            Transform::MoebiusTransform(t) => t.transform_point(p)
         }
     }
 
     pub fn transform_color(&self, c: Color) -> Color {
         match self {
-            Transforms::Linear(t) => t.transform_color(c),
-            Transforms::Affine(t) => t.transform_color(c),
-            Transforms::InverseJulia(t) => t.transform_color(c),
-            Transforms::Moebius(t) => t.transform_color(c)
+            Transform::LinearTransform(t) => t.transform_color(c),
+            Transform::AffineTransform(t) => t.transform_color(c),
+            Transform::InverseJuliaTransform(t) => t.transform_color(c),
+            Transform::MoebiusTransform(t) => t.transform_color(c)
         }
     }
 
-    pub fn morph(&self, other: Transforms, pct: f32) -> Transforms {
+    pub fn morph(&self, other: Transform, pct: f32) -> Transform {
         match (self, other) {
-            (Transforms::Linear(t), Transforms::Linear(o)) => Transforms::Linear(t.morph(&o, pct)),
-            (Transforms::Moebius(t), Transforms::Moebius(o)) => Transforms::Moebius(t.morph(&o, pct)),
-            (Transforms::Affine(t), Transforms::Affine(o)) => Transforms::Affine(t.morph(&o, pct)),
-            (Transforms::InverseJulia(t), Transforms::InverseJulia(o)) => Transforms::InverseJulia(t.morph(&o, pct)),
+            (Transform::LinearTransform(t), Transform::LinearTransform(o)) => t.morph(&o, pct).into(),
+            (Transform::MoebiusTransform(t), Transform::MoebiusTransform(o)) => t.morph(&o, pct).into(),
+            (Transform::AffineTransform(t), Transform::AffineTransform(o)) => t.morph(&o, pct).into(),
+            (Transform::InverseJuliaTransform(t), Transform::InverseJuliaTransform(o)) => t.morph(&o, pct).into(),
             _ => panic!("self and other must be the same transform type")
         }
     }
 }
 
 /// All transforms must have this trait
-#[typetag::serde(tag = "type")]
+#[enum_dispatch]
+//#[typetag::serde(tag = "type")]
 pub trait Transformable {
     /// Gets the transforms base color, i.e. the color of the transform that gets repeatedly mixed
     fn get_base_color(&self) -> Color;
@@ -135,12 +138,12 @@ pub trait Morphable<T: Transformable + ?Sized> {
 //     }
 // }
 
-pub fn transform_from_str(name: String) -> Transforms {
+pub fn transform_from_str(name: String) -> Transform {
     match name.as_str() {
-        "LinearTransform" => Transforms::Linear(LinearTransform::random()),
-        "AffineTransform" => Transforms::Affine(AffineTransform::random()),
-        "MoebiusTransform" => Transforms::Moebius(MoebiusTransform::random()),
-        "InverseJuliaTransform" => Transforms::InverseJulia(InverseJuliaTransform::random()),
+        "LinearTransform" => LinearTransform::random().into(),
+        "AffineTransform" => AffineTransform::random().into(),
+        "MoebiusTransform" => MoebiusTransform::random().into(),
+        "InverseJuliaTransform" => InverseJuliaTransform::random().into(),
         _ => panic!("Not a supported transform kind")
     }
 }
@@ -205,7 +208,7 @@ impl Default for LinearTransform {
     }
 }
 
-#[typetag::serde]
+// #[typetag::serde]
 impl Transformable for LinearTransform {
     fn transform_point(&self, point: Point) -> Point {
         Point {
@@ -335,7 +338,7 @@ impl Default for AffineTransform {
     }
 }
 
-#[typetag::serde]
+// #[typetag::serde]
 impl Transformable for AffineTransform {
     fn transform_point(&self, point: Point) -> Point {
         Point {
@@ -442,7 +445,7 @@ impl Default for MoebiusTransform {
     }
 }
 
-#[typetag::serde]
+// #[typetag::serde]
 impl Transformable for MoebiusTransform {
     fn transform_point(&self, point: Point) -> Point {
         let z = Complex32 {
@@ -532,7 +535,7 @@ impl Default for InverseJuliaTransform {
     }
 }
 
-#[typetag::serde]
+// #[typetag::serde]
 impl Transformable for InverseJuliaTransform {
 
     fn transform_point(&self, point: Point) -> Point {

@@ -16,6 +16,7 @@ exclude = ["examples/"]
 
 [dependencies]
 clap = { version = "4.3.19", features = ["derive"] }
+enum_dispatch = "0.3.12"
 env_logger = "0.10.0"
 image = "0.24.6"
 ndarray = "0.15.6"

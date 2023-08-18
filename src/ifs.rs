@@ -10,7 +10,7 @@ use crate::image::*;
 /// Iterated function system
 pub struct IFS {
     /// transforms used in the iterated function system
-    transforms: Vec<Transforms>,
+    transforms: Vec<Transform>,
     /// the number of transforms in the IFS, stored for efficiency
     num_transforms: usize,
     /// the total weight of all the transforms in the IFS, stored for efficiency
@@ -32,7 +32,7 @@ impl IFS{
         self.num_transforms
     }
 
-    pub fn get_transform(&self, i: usize) -> Transforms {
+    pub fn get_transform(&self, i: usize) -> Transform {
         if i < self.len() {
             *self.transforms.get(i).unwrap()
         } else {
@@ -61,7 +61,7 @@ impl IFS{
     /// let mut my_ifs = IFS::new();
     /// my_ifs.add_transform(AffineTransform::random().into());
     /// ```
-    pub fn add_transform(&mut self, transform: Transforms) {
+    pub fn add_transform(&mut self, transform: Transform) {
         self.total_weight += transform.get_weight();
         self.transforms.insert(self.num_transforms, transform);
         self.num_transforms += 1;
@@ -69,7 +69,7 @@ impl IFS{
     }
 
     /// Select a transform at random according to the weighting 
-    fn choose_transform(&self) -> &Transforms {
+    fn choose_transform(&self) -> &Transform {
         let mut rng = thread_rng();
         self.transforms.get(self.distribution.sample(&mut rng)).unwrap()
         //self.transforms.get(self.distribution.sample(&mut rng)).unwrap()
