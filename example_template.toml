@@ -1,4 +1,18 @@
-random_transforms = ["LinearTransform", "AffineTransform", "MoebiusTransform", "InverseJuliaTransform", "InverseJuliaTransform"]
+# random_transforms = ["LinearTransform", 
+#                      "AffineTransform", 
+#                      "AffineTransform",
+#                      "MoebiusTransform", 
+#                      "MoebiusTransform",
+#                      "InverseJuliaTransform", 
+#                      "InverseJuliaTransform"]
+
+random_transforms = [
+                     "AffineTransform", 
+                     "MoebiusTransform", 
+                     "InverseJuliaTransform",
+                     "InverseJuliaTransform"]
+
+
 
 [image_settings]
 width = 1000
