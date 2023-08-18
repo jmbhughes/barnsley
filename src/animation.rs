@@ -66,7 +66,7 @@ impl AnimationSequence {
 
 #[cfg(test)]
 mod tests {
-    use crate::{ifs::IFS, transform::AffineTransform, animation::AnimationSequence};
+    use crate::{ifs::IFS, animation::AnimationSequence};
 
     #[test]
     fn test_determine_current_pair_index() {
