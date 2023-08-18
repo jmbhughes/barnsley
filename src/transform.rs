@@ -44,42 +44,6 @@ pub enum Transform {
 }
 
 impl Transform {
-    pub fn get_name(&self) -> String {
-        match self {
-            Transform::LinearTransform(t) => t.get_name(),
-            Transform::AffineTransform(t) => t.get_name(),
-            Transform::InverseJuliaTransform(t) => t.get_name(),
-            Transform::MoebiusTransform(t) => t.get_name()
-        }
-    }
-
-    pub fn get_weight(&self) -> f32 {
-        match self {
-            Transform::LinearTransform(t) => t.get_weight(),
-            Transform::AffineTransform(t) => t.get_weight(),
-            Transform::InverseJuliaTransform(t) => t.get_weight(),
-            Transform::MoebiusTransform(t) => t.get_weight()
-        }
-    }
-
-    pub fn transform_point(&self, p: Point) -> Point {
-        match self {
-            Transform::LinearTransform(t) => t.transform_point(p),
-            Transform::AffineTransform(t) => t.transform_point(p),
-            Transform::InverseJuliaTransform(t) => t.transform_point(p),
-            Transform::MoebiusTransform(t) => t.transform_point(p)
-        }
-    }
-
-    pub fn transform_color(&self, c: Color) -> Color {
-        match self {
-            Transform::LinearTransform(t) => t.transform_color(c),
-            Transform::AffineTransform(t) => t.transform_color(c),
-            Transform::InverseJuliaTransform(t) => t.transform_color(c),
-            Transform::MoebiusTransform(t) => t.transform_color(c)
-        }
-    }
-
     pub fn morph(&self, other: Transform, pct: f32) -> Transform {
         match (self, other) {
             (Transform::LinearTransform(t), Transform::LinearTransform(o)) => t.morph(&o, pct).into(),
