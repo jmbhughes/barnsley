@@ -77,7 +77,7 @@ pub trait Transformable {
     /// Retreives the transforms weight
     fn get_weight(&self) -> f32;
 
-    /// Retrieves the name of the transformed, used by `TransformEnum::random`
+    /// Retrieves the name of the transformed
     fn get_name(&self) -> String;
 }
 
