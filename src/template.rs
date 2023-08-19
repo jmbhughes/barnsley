@@ -12,6 +12,7 @@ pub struct Template {
 }
 
 impl Template {
+    /// Generate a `Config` from the `Template`
     pub fn generate(&self) -> Config {
         let mut transforms: Vec<Transform> = vec![];
         for transform_name in self.random_transforms.clone() {

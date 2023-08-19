@@ -13,6 +13,7 @@ pub struct Config {
 }
 
 impl Config{
+   /// Runs a config. 
    pub fn run(self) {
       let mut ifs = IFS::new();
 

@@ -9,30 +9,35 @@ const DISPLAY_LUMINANCE_MAX: f32 = 200.0;
 const SCALEFACTOR_NUMERATOR: f32 = 5.828968; // 1.219 + (DISPLAY_LUMINANCE_MAX * 0.25).powf(0.4);
 const GAMMA_ENCODE: f32 = 0.45;
 
+/// Two-dimensional image.
 pub struct Image {
     data: Array3<f32>
 }
 
 impl Image {
-
+    /// Create a new image with given `width` and `height`. 
     pub fn new(width: usize, height: usize) -> Image {
         Image {
             data: Array3::zeros((width, height, 3))
         }
     }
 
+    /// Blank out the image to all zeros.
     pub fn clear(&mut self) {
         self.data = Array3::zeros((self.width(), self.height(), 3));
     }
 
+    /// Get the width of the image. 
     pub fn width(&self) -> usize {
         self.data.shape()[0]
     }
 
+    /// Get the hiehgt of the image. 
     pub fn height(&self) -> usize {
         self.data.shape()[1]
     }
 
+    /// At `(x, y)` add a bit of `radiance` color. 
     pub fn add_radiance(&mut self, x: usize, y: usize, radiance: Color) {
         if x < self.width() && y < self.height() {
             self.data[[x, y, 0]] += radiance.r;
@@ -52,7 +57,6 @@ impl Image {
                 lum /= iterations as f32;
 
                 sum_of_logs += (lum.max(0.0001)).log10();
-                // sum_of_logs += log10f32()
             }
         }
         let log_mean_luminance = 10.0f32.powf(sum_of_logs / (self.width() * self.height()) as f32);
@@ -64,6 +68,7 @@ impl Image {
         (self.data.clone() * scalefactor / iterations as f32).mapv(|v| v.max(0.0).powf(GAMMA_ENCODE))
     }
 
+    /// Save an image to the location `filename`. `iterations` is required to figure out the appropriate scaling for the IFS. 
     pub fn save(&self, filename: &str, iterations: usize) {
         let pixels = self.get_gamma_corrected_pixels(iterations);
 
@@ -74,6 +79,7 @@ impl Image {
 
     }
 
+    /// Convert the `f32` Array of colors to a `u8` scaled image. 
     pub fn to_u8(&self, iterations: usize) -> Array3<u8> {
         self.get_gamma_corrected_pixels(iterations)
             .map(|v| ((v * 255.0 + 0.5) as u8).max(0).min(255))

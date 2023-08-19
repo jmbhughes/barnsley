@@ -8,8 +8,7 @@
 //! 1. Create a struct to store the transforms parameters. It should have a `base_color` and `weight` too.
 //! 2. Derive `Serialize, Deserialize, Copy, Clone, Debug` for the new transform struct.
 //! 3. Implement the `transform` trait for that struct.
-//! 4. Add the transform to the `TransformEnum` enum.
-//! 5. Add the random generation for `TransformEnum::random`.
+//! 4. Add the transform to the `Transform` enum.
 
 use crate::util::*;
 use num::complex::{Complex, Complex32};
@@ -19,8 +18,6 @@ use serde::{Deserialize, Serialize};
 use std::default::Default;
 use std::f32::consts::PI;
 use enum_dispatch::enum_dispatch;
-
-pub trait NewTrait: Transformable + Morphable<dyn Transformable> {}
 
 /// Use to map a point (x,y) to image space.
 pub fn final_transform(x: f32, y: f32) -> (f32, f32) {
