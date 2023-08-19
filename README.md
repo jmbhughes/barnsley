@@ -1,4 +1,7 @@
 # barnsley: Iterated Function Systems in Rust
+[![Crates.io](https://img.shields.io/crates/v/barnsley.svg)](https://crates.io/crates/barnsley)
+[![Crates.io](https://img.shields.io/crates/d/barnsley.svg)](https://crates.io/crates/barnsley)
+[![CI](https://github.com/jmbhughes/barnsley/actions/workflows/ci.yml/badge.svg)](https://github.com/jmbhughes/barnsley/actions/workflows/ci.yml)
 
 Make your own images like this! Look at at all the variety in the [examples](examples/).
 
