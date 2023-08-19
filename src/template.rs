@@ -1,6 +1,5 @@
 //! representation of an non-parameterized, random IFS
 
-use std::str::FromStr;
 use serde::{Serialize, Deserialize};
 use crate::transform::*;
 use crate::config::*;
@@ -13,10 +12,11 @@ pub struct Template {
 }
 
 impl Template {
+    /// Generate a `Config` from the `Template`
     pub fn generate(&self) -> Config {
-        let mut transforms: Vec<TransformEnum> = vec![];
+        let mut transforms: Vec<Transform> = vec![];
         for transform_name in self.random_transforms.clone() {
-            transforms.insert(transforms.len(), TransformEnum::from_str(&transform_name).unwrap().random());
+            transforms.insert(transforms.len(), transform_from_str(transform_name));
         }
         Config{image_settings: self.image_settings.clone(), evaluation_settings: self.evaluation_settings, transforms}
     }

@@ -1,0 +1,62 @@
+{
+    "image_settings": {
+        "width": 1000,
+        "height": 1000,
+        "path": "sierpinski.png"
+    },
+    "evaluation_settings": {
+        "num_iterations": 10000,
+        "num_points": 1000
+    },
+
+    "transforms": [
+        {
+            "AffineTransform": {
+                "a": 0.5,
+                "b": 0.0,
+                "c": 0.0,
+                "d": 0.5,
+                "xshift": 1.0,
+                "yshift": 0.0,
+                "base_color": {
+                    "r": 1.0,
+                    "g": 0.0,
+                    "b": 0.0
+                },
+                "weight": 1.0
+            }
+        },
+        {
+            "AffineTransform": {
+                "a": 0.5,
+                "b": 0.0,
+                "c": 0.0,
+                "d": 0.5,
+                "xshift": 0.0,
+                "yshift": 0.0,
+                "base_color": {
+                    "r": 0.0,
+                    "g": 1.0,
+                    "b": 0.0
+                },
+                "weight": 1.0
+            }
+        },
+        {
+            "AffineTransform": {
+                "a": 0.5,
+                "b": 0.0,
+                "c": 0.0,
+                "d": 0.5,
+                "xshift": 0.0,
+                "yshift": 1.0,
+                "base_color": {
+                    "r": 0.0,
+                    "g": 0.0,
+                    "b": 1.0
+                },
+                "weight": 1.0
+            }
+        }
+    ]
+}

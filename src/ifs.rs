@@ -6,10 +6,11 @@ use crate::util::*;
 use crate::transform::*;
 use crate::image::*;
 
+
 /// Iterated function system
 pub struct IFS {
     /// transforms used in the iterated function system
-    transforms: Vec<TransformEnum>,
+    transforms: Vec<Transform>,
     /// the number of transforms in the IFS, stored for efficiency
     num_transforms: usize,
     /// the total weight of all the transforms in the IFS, stored for efficiency
@@ -27,6 +28,35 @@ impl IFS{
         distribution: WeightedIndex::new([1.]).unwrap()}
     }
 
+    pub fn len(&self) -> usize {
+        self.num_transforms
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.num_transforms == 0
+    }
+
+    pub fn get_transform(&self, i: usize) -> Transform {
+        if i < self.len() {
+            *self.transforms.get(i).unwrap()
+        } else {
+            panic!("i is greater than the number of transforms")
+        }
+    }
+
+    pub fn check_transforms_match(&self, other: &Self) -> bool {
+        if self.transforms.len() != other.transforms.len() {
+            false
+        } else {
+            for i in 0..self.transforms.len() {
+                if self.transforms.get(i).unwrap().get_name() != other.transforms.get(i).unwrap().get_name() {
+                    return false
+                }
+            }
+            true
+        }
+    }
+
     /// Add a transform to the IFS
     /// 
     /// ```rust
@@ -35,7 +65,7 @@ impl IFS{
     /// let mut my_ifs = IFS::new();
     /// my_ifs.add_transform(AffineTransform::random().into());
     /// ```
-    pub fn add_transform<'a>(&mut self, transform: TransformEnum) {
+    pub fn add_transform(&mut self, transform: Transform) {
         self.total_weight += transform.get_weight();
         self.transforms.insert(self.num_transforms, transform);
         self.num_transforms += 1;
@@ -43,9 +73,10 @@ impl IFS{
     }
 
     /// Select a transform at random according to the weighting 
-    fn choose_transform(&self) -> &TransformEnum {
+    fn choose_transform(&self) -> &Transform {
         let mut rng = thread_rng();
         self.transforms.get(self.distribution.sample(&mut rng)).unwrap()
+        //self.transforms.get(self.distribution.sample(&mut rng)).unwrap()
     }   
 
     /// Evaluate a transform 
@@ -85,5 +116,26 @@ impl IFS{
             
             image.add_radiance(x, y, color);
         }
+    }
+
+    pub fn morph(&self, other: &Self, pct: f32) -> Self {
+           if !self.check_transforms_match(other) {
+               panic!("Transforms must match");
+           } else {
+               let mut out = IFS::new();
+               for i in 0..self.transforms.len() {
+                    let a = *self.transforms.get(i).unwrap();
+                    let b = *other.transforms.get(i).unwrap();
+                    let new = a.morph(b, pct);
+                    out.add_transform(new);
+               }
+               out
+           }
+   }
+}
+
+impl Default for IFS {
+    fn default() -> Self {
+        Self::new()
     }
 }

@@ -1,10 +1,12 @@
+#![cfg_attr(not(debug_assertions), windows_subsystem = "windows")] // hide console window on Windows in release
+
 use barnsley::config::*;
 use barnsley::template::*;
 use clap::{Parser, Subcommand};
 use std::fs::File;
 use std::io::Read;
-use serde_json;
-use toml;
+
+
 
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]
@@ -29,7 +31,6 @@ fn load_template(template_path: &String) -> Template{
     let mut data = String::new();
     file.read_to_string(&mut data).unwrap();
     toml::from_str(&data).unwrap()
-
 }
 
 fn load_config(config_path: &String) -> Config {
@@ -37,8 +38,8 @@ fn load_config(config_path: &String) -> Config {
     let mut data = String::new();
     file.read_to_string(&mut data).unwrap();
     serde_json::from_str(&data).unwrap()
-
 }
+
 
 fn main() {
     let cli = Cli::parse();

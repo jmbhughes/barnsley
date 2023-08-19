@@ -37,3 +37,4 @@ pub mod transform;
 pub mod util;
 pub mod config;
 pub mod template;
+pub mod animation;

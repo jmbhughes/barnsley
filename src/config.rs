@@ -1,5 +1,4 @@
 //! core definition for an IFS run that can be serialized to a file
-
 use serde::{Serialize, Deserialize};
 use crate::transform::*;
 use crate::ifs::*;
@@ -10,14 +9,16 @@ use crate::image::Image;
 pub struct Config {
    pub image_settings: ImageSettings,
    pub evaluation_settings: EvaluationSettings,
-   pub transforms: Vec<TransformEnum>,
+   pub transforms: Vec<Transform>
 }
 
-impl Config {
-   pub fn run(&self) {
+impl Config{
+   /// Runs a config. 
+   pub fn run(self) {
       let mut ifs = IFS::new();
-      for tranform in self.transforms.iter() {
-         ifs.add_transform(*tranform);
+
+      for transform in self.transforms.into_iter() {
+         ifs.add_transform(transform);
       }
 
     let num_points = self.evaluation_settings.num_points as usize;
@@ -34,7 +35,7 @@ impl Config {
 pub struct ImageSettings {
    /// how wide in pixels the generated image will be
    pub width: u32,
-   /// how tall in pixels the generated image will be
+   /// how tall in pixels the generated image will be    
    pub height: u32,
    /// where to save the image
    pub path: String
