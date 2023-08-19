@@ -4,9 +4,13 @@ Make your own images like this! Look at at all the variety in the [examples](exa
 
 ![example image](https://github.com/jmbhughes/barnsley/blob/main/examples/example4.png?raw=true)
 
-This code is based on [pyifs](https://github.com/jtauber/pyifs) written by [James Tauber](https://github.com/jtauber) for Python. 
+## Make your own!
+You can use [https://barnsley.dev](https://barnsley.dev) to generate your own IFS and animations right in the browser. 
 
-## How to run
+This website is built in the [barnsley_gui repo](https://github.com/jmbhughes/barnsley_gui). 
+
+## How to run crate
+### Install
 Rust is required to run this code. [Installation of Rust is easy though](https://www.rust-lang.org/tools/install). 
 Once you have rust, install Barnsley with `cargo install barnsley`. 
 
@@ -40,11 +44,7 @@ It can be used to recreate an image at a later date.
 
 Try different combinations of them to generate new images. 
 
-## Coming soon
-- [x] the base package 
-- [x] a configurable main function 
-- [ ] more color schemes
-- [ ] more transforms
-- [ ] a mathematical guide
-- [ ] classic fractals
-- [ ] animation of the ifs executing
+## Origins
+This code is based on [pyifs](https://github.com/jtauber/pyifs) written by [James Tauber](https://github.com/jtauber) for Python. 
+
+The crate name is in honor of Michael Barnsley, a leading researcher of iterated function systems.
