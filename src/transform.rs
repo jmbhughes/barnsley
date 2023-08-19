@@ -31,7 +31,7 @@ pub fn final_transform(x: f32, y: f32) -> (f32, f32) {
 
     let z = Complex32::new(x, y);
     let z2 = (a * z + b) / (c * z + d);
-    return (z2.re, z2.im);
+    (z2.re, z2.im)
 }
 
 #[enum_dispatch(Transformable)]
@@ -112,12 +112,12 @@ pub struct LinearTransform {
 impl LinearTransform {
     pub fn new(a: f32, b: f32, c: f32, d: f32, base_color: Color, weight: f32) -> LinearTransform {
         LinearTransform {
-            a: a,
-            b: b,
-            c: c,
-            d: d,
-            base_color: base_color,
-            weight: weight,
+            a,
+            b,
+            c,
+            d,
+            base_color,
+            weight,
         }
     }
 
@@ -213,14 +213,14 @@ impl AffineTransform {
         weight: f32,
     ) -> AffineTransform {
         AffineTransform {
-            a: a,
-            b: b,
-            c: c,
-            d: d,
-            xshift: xshift,
-            yshift: yshift,
-            base_color: base_color,
-            weight: weight,
+            a,
+            b,
+            c,
+            d,
+            xshift,
+            yshift,
+            base_color,
+            weight,
         }
     }
 
@@ -325,12 +325,12 @@ impl MoebiusTransform {
         weight: f32,
     ) -> MoebiusTransform {
         MoebiusTransform {
-            a: a,
-            b: b,
-            c: c,
-            d: d,
-            base_color: base_color,
-            weight: weight,
+            a,
+            b,
+            c,
+            d,
+            base_color,
+            weight,
         }
     }
 
@@ -372,7 +372,6 @@ impl Default for MoebiusTransform {
     }
 }
 
-// #[typetag::serde]
 impl Transformable for MoebiusTransform {
     fn transform_point(&self, point: Point) -> Point {
         let z = Complex32 {
@@ -425,9 +424,9 @@ impl InverseJuliaTransform {
         InverseJuliaTransform {
             r,
             theta,
-            base_color: base_color,
-            weight: weight,
-            c: c,
+            base_color,
+            weight,
+            c,
         }
     }
 

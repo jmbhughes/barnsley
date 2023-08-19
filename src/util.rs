@@ -1,6 +1,6 @@
 //! useful support functionality
 
-use num::{complex::{Complex32}, FromPrimitive};
+use num::{complex::Complex32, FromPrimitive};
 use rand::prelude::*;
 use serde::{Deserialize, Serialize};
 use std::{default::Default, ops::{Add, Mul}};
@@ -81,9 +81,9 @@ impl FromPrimitive for Color {
     }
 
     fn from_f32(n: f32) -> Option<Self> {
-        Some(Color { r: (n as f32).clamp(0.0, 1.0),
-            g: (n as f32).clamp(0.0, 1.0),
-            b: (n as f32).clamp(0.0, 1.0)})
+        Some(Color { r: n.clamp(0.0, 1.0),
+            g: n.clamp(0.0, 1.0),
+            b: n.clamp(0.0, 1.0)})
     }
 }
 

@@ -32,6 +32,10 @@ impl IFS{
         self.num_transforms
     }
 
+    pub fn is_empty(&self) -> bool {
+        self.num_transforms == 0
+    }
+
     pub fn get_transform(&self, i: usize) -> Transform {
         if i < self.len() {
             *self.transforms.get(i).unwrap()
@@ -115,7 +119,7 @@ impl IFS{
     }
 
     pub fn morph(&self, other: &Self, pct: f32) -> Self {
-           if !self.check_transforms_match(&other) {
+           if !self.check_transforms_match(other) {
                panic!("Transforms must match");
            } else {
                let mut out = IFS::new();
@@ -128,4 +132,10 @@ impl IFS{
                out
            }
    }
+}
+
+impl Default for IFS {
+    fn default() -> Self {
+        Self::new()
+    }
 }
