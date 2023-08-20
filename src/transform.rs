@@ -15,6 +15,7 @@ use num::complex::{Complex, Complex32};
 use rand::prelude::*;
 use rand_distr::{Distribution, Normal};
 use serde::{Deserialize, Serialize};
+use strum_macros::EnumIter;
 use std::default::Default;
 use std::f32::consts::PI;
 use enum_dispatch::enum_dispatch;
@@ -32,7 +33,7 @@ pub fn final_transform(x: f32, y: f32) -> (f32, f32) {
 }
 
 #[enum_dispatch(Transformable)]
-#[derive(Serialize, Deserialize, Copy, Clone)]
+#[derive(Serialize, Deserialize, Copy, Clone, EnumIter, PartialEq)]
 pub enum Transform {
     LinearTransform,
     AffineTransform,
@@ -48,6 +49,15 @@ impl Transform {
             (Transform::AffineTransform(t), Transform::AffineTransform(o)) => t.morph(&o, pct).into(),
             (Transform::InverseJuliaTransform(t), Transform::InverseJuliaTransform(o)) => t.morph(&o, pct).into(),
             _ => panic!("self and other must be the same transform type")
+        }
+    }
+
+    pub fn index(&self) -> usize {
+        match self {
+            Transform::LinearTransform(_) => 0,
+            Transform::AffineTransform(_) => 1,
+            Transform::MoebiusTransform(_) => 2,
+            Transform::InverseJuliaTransform(_) => 3
         }
     }
 }
@@ -96,9 +106,9 @@ pub fn transform_from_str(name: String) -> Transform {
 /// LinearTransform defined by the matrix:
 /// [a b]
 /// [c d]
-#[derive(Serialize, Deserialize, Copy, Clone, Debug)]
+#[derive(Serialize, Deserialize, Copy, Clone, Debug, PartialEq)]
 pub struct LinearTransform {
-    a: f32,
+    pub a: f32,
     b: f32,
     c: f32,
     d: f32,
@@ -186,9 +196,9 @@ impl Morphable<LinearTransform> for LinearTransform {
 }
 
 // AFFINE TRANSFORM
-#[derive(Serialize, Deserialize, Copy, Clone, Debug)]
+#[derive(Serialize, Deserialize, Copy, Clone, Debug, PartialEq)]
 pub struct AffineTransform {
-    a: f32,
+    pub a: f32,
     b: f32,
     c: f32,
     d: f32,
@@ -302,7 +312,7 @@ impl Morphable<AffineTransform> for AffineTransform {
 }
 
 // MOEBIUS TRANSFORM
-#[derive(Serialize, Deserialize, Copy, Clone, Debug)]
+#[derive(Serialize, Deserialize, Copy, Clone, Debug, PartialEq)]
 pub struct MoebiusTransform {
     a: Complex<f32>,
     b: Complex32,
@@ -406,7 +416,7 @@ impl Morphable<MoebiusTransform> for MoebiusTransform {
 
 // INVERSE JULIA TRANSFORM
 
-#[derive(Serialize, Deserialize, Copy, Clone, Debug)]
+#[derive(Serialize, Deserialize, Copy, Clone, Debug, PartialEq)]
 pub struct InverseJuliaTransform {
     r: f32,
     theta: f32,

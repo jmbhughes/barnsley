@@ -25,7 +25,7 @@ pub fn lerp_color(a: Color, b: Color, pct: f32) -> Color {
 }
 
 /// representation of an RGB color
-#[derive(Copy, Clone, Serialize, Deserialize, Debug)]
+#[derive(Copy, Clone, Serialize, Deserialize, Debug, PartialEq)]
 pub struct Color {
     pub r: f32,
     pub g: f32,
