@@ -10,7 +10,7 @@ use crate::image::*;
 /// Iterated function system
 pub struct IFS {
     /// transforms used in the iterated function system
-    transforms: Vec<Transform>,
+    pub transforms: Vec<Transform>,
     /// the number of transforms in the IFS, stored for efficiency
     num_transforms: usize,
     /// the total weight of all the transforms in the IFS, stored for efficiency
@@ -69,6 +69,14 @@ impl IFS{
         self.total_weight += transform.get_weight();
         self.transforms.insert(self.num_transforms, transform);
         self.num_transforms += 1;
+        self.distribution = WeightedIndex::new(self.transforms.iter().map(|t| t.get_weight())).unwrap(); 
+    }
+
+    pub fn delete_transform(&mut self, index: usize) {
+        let transform = self.transforms.get(index).unwrap();
+        self.total_weight -= transform.get_weight();
+        self.num_transforms -= 1;
+        self.transforms.remove(index);
         self.distribution = WeightedIndex::new(self.transforms.iter().map(|t| t.get_weight())).unwrap(); 
     }
 
