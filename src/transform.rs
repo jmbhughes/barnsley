@@ -109,11 +109,11 @@ pub fn transform_from_str(name: String) -> Transform {
 #[derive(Serialize, Deserialize, Copy, Clone, Debug, PartialEq)]
 pub struct LinearTransform {
     pub a: f32,
-    b: f32,
-    c: f32,
-    d: f32,
-    base_color: Color,
-    weight: f32,
+    pub b: f32,
+    pub c: f32,
+    pub d: f32,
+    pub base_color: Color,
+    pub weight: f32,
 }
 
 impl LinearTransform {
@@ -199,13 +199,13 @@ impl Morphable<LinearTransform> for LinearTransform {
 #[derive(Serialize, Deserialize, Copy, Clone, Debug, PartialEq)]
 pub struct AffineTransform {
     pub a: f32,
-    b: f32,
-    c: f32,
-    d: f32,
-    xshift: f32,
-    yshift: f32,
-    base_color: Color,
-    weight: f32,
+    pub b: f32,
+    pub c: f32,
+    pub d: f32,
+    pub xshift: f32,
+    pub yshift: f32,
+    pub base_color: Color,
+    pub weight: f32,
 }
 
 impl AffineTransform {
@@ -314,12 +314,12 @@ impl Morphable<AffineTransform> for AffineTransform {
 // MOEBIUS TRANSFORM
 #[derive(Serialize, Deserialize, Copy, Clone, Debug, PartialEq)]
 pub struct MoebiusTransform {
-    a: Complex<f32>,
-    b: Complex32,
-    c: Complex32,
-    d: Complex32,
-    base_color: Color,
-    weight: f32,
+    pub a: Complex<f32>,
+    pub b: Complex32,
+    pub c: Complex32,
+    pub d: Complex32,
+    pub base_color: Color,
+    pub weight: f32,
 }
 
 impl MoebiusTransform {
@@ -418,22 +418,19 @@ impl Morphable<MoebiusTransform> for MoebiusTransform {
 
 #[derive(Serialize, Deserialize, Copy, Clone, Debug, PartialEq)]
 pub struct InverseJuliaTransform {
-    r: f32,
-    theta: f32,
-    base_color: Color,
-    weight: f32,
-    c: Complex32,
+    pub r: f32,
+    pub theta: f32,
+    pub base_color: Color,
+    pub weight: f32
 }
 
 impl InverseJuliaTransform {
     pub fn new(r: f32, theta: f32, base_color: Color, weight: f32) -> InverseJuliaTransform {
-        let c = Complex32::new(r * theta.cos(), r * theta.sin());
         InverseJuliaTransform {
             r,
             theta,
             base_color,
             weight,
-            c,
         }
     }
 
@@ -468,11 +465,13 @@ impl Default for InverseJuliaTransform {
 impl Transformable for InverseJuliaTransform {
 
     fn transform_point(&self, point: Point) -> Point {
+        let c = Complex32::new(self.r * self.theta.cos(), self.r * self.theta.sin());
+
         let z = Complex32 {
             re: point.x,
             im: point.y,
         };
-        let z2 = self.c - z;
+        let z2 = c - z;
         let new_theta = z2.im.atan2(z2.re) * 0.5;
         let sqrt_r = vec![1., -1.].choose(&mut rand::thread_rng()).unwrap()
             * ((z2.im * z2.im + z2.re * z2.re).powf(0.25));
