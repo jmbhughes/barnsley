@@ -2,6 +2,7 @@
 use rand::prelude::*;
 use rand::distributions::WeightedIndex;
 use rand_distr::Distribution;
+use crate::transform;
 use crate::util::*;
 use crate::transform::*;
 use crate::image::*;
@@ -26,6 +27,13 @@ impl IFS{
         num_transforms: 0,
         total_weight: 0.,
         distribution: WeightedIndex::new([1.]).unwrap()}
+    }
+
+    /// Update the IFS to new random weights and random parameters for each transform
+    pub fn randomize(&mut self) {
+        self.transforms = self.transforms.iter().map(|t| transform_from_str(t.get_name())).collect();
+        self.distribution = WeightedIndex::new(self.transforms.iter().map(|t| t.get_weight())).unwrap(); 
+        self.total_weight = self.transforms.iter().map(|t| t.get_weight()).sum();
     }
 
     pub fn len(&self) -> usize {
@@ -84,7 +92,6 @@ impl IFS{
     fn choose_transform(&self) -> &Transform {
         let mut rng = thread_rng();
         self.transforms.get(self.distribution.sample(&mut rng)).unwrap()
-        //self.transforms.get(self.distribution.sample(&mut rng)).unwrap()
     }   
 
     /// Evaluate a transform 
