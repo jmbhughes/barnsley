@@ -81,7 +81,7 @@ pub trait Transformable {
     /// Applies the transformation to a point
     fn transform_point(&self, point: Point) -> Point;
 
-    /// Retreives the transforms weight
+    /// Retrieves the transforms weight
     fn get_weight(&self) -> f32;
 
     /// Retrieves the name of the transformed
@@ -129,7 +129,7 @@ impl LinearTransform {
     }
 
     pub fn random() -> LinearTransform {
-        let mut rng = rand::thread_rng();
+        let mut rng = thread_rng();
         let a: f32 = rng.gen::<f32>() * 2. - 1.;
         let b: f32 = rng.gen::<f32>() * 2. - 1.;
         let c: f32 = rng.gen::<f32>() * 2. - 1.;
@@ -163,6 +163,10 @@ impl Default for LinearTransform {
 }
 
 impl Transformable for LinearTransform {
+    fn get_base_color(&self) -> Color {
+        self.base_color
+    }
+
     fn transform_point(&self, point: Point) -> Point {
         Point {
             x: self.a * point.x + self.b * point.y,
@@ -172,10 +176,6 @@ impl Transformable for LinearTransform {
 
     fn get_weight(&self) -> f32 {
         self.weight
-    }
-
-    fn get_base_color(&self) -> Color {
-        self.base_color
     }
 
     fn get_name(&self) -> String {
@@ -202,8 +202,8 @@ pub struct AffineTransform {
     pub b: f32,
     pub c: f32,
     pub d: f32,
-    pub xshift: f32,
-    pub yshift: f32,
+    pub x_shift: f32,
+    pub y_shift: f32,
     pub base_color: Color,
     pub weight: f32,
 }
@@ -214,8 +214,8 @@ impl AffineTransform {
         b: f32,
         c: f32,
         d: f32,
-        xshift: f32,
-        yshift: f32,
+        x_shift: f32,
+        y_shift: f32,
         base_color: Color,
         weight: f32,
     ) -> AffineTransform {
@@ -224,21 +224,21 @@ impl AffineTransform {
             b,
             c,
             d,
-            xshift,
-            yshift,
+            x_shift,
+            y_shift,
             base_color,
             weight,
         }
     }
 
     pub fn random() -> AffineTransform {
-        let mut rng = rand::thread_rng();
+        let mut rng = thread_rng();
         let a: f32 = rng.gen::<f32>() * 2. - 1.;
         let b: f32 = rng.gen::<f32>() * 2. - 1.;
         let c: f32 = rng.gen::<f32>() * 2. - 1.;
         let d: f32 = rng.gen::<f32>() * 2. - 1.;
-        let xshift: f32 = rng.gen::<f32>() * 4. - 2.;
-        let yshift: f32 = rng.gen::<f32>() * 4. - 2.;
+        let x_shift: f32 = rng.gen::<f32>() * 4. - 2.;
+        let y_shift: f32 = rng.gen::<f32>() * 4. - 2.;
 
         let normal: Normal<f64> = Normal::new(1.0, 0.15).unwrap();
         let weight: f32 = normal.sample(&mut rng) as f32;
@@ -248,8 +248,8 @@ impl AffineTransform {
             b,
             c,
             d,
-            xshift,
-            yshift,
+            x_shift,
+            y_shift,
             base_color: Color::random(),
             weight,
         }
@@ -257,14 +257,14 @@ impl AffineTransform {
 
    fn morph(&self, other: &Self, pct: f32) -> Self {
        AffineTransform::new(
-                    lerp_f32(self.a, other.a, pct),
-                    lerp_f32(self.b, other.b, pct),
-                    lerp_f32(self.c, other.c, pct),
-                    lerp_f32(self.d, other.d, pct),
-                    lerp_f32(self.xshift, other.xshift, pct),
-                    lerp_f32(self.yshift, other.yshift, pct),
-                    lerp_color(self.base_color, other.base_color, pct),
-                    lerp_f32(self.weight, other.weight, pct))
+           lerp_f32(self.a, other.a, pct),
+           lerp_f32(self.b, other.b, pct),
+           lerp_f32(self.c, other.c, pct),
+           lerp_f32(self.d, other.d, pct),
+           lerp_f32(self.x_shift, other.x_shift, pct),
+           lerp_f32(self.y_shift, other.y_shift, pct),
+           lerp_color(self.base_color, other.base_color, pct),
+           lerp_f32(self.weight, other.weight, pct))
     }
 
 
@@ -277,19 +277,19 @@ impl Default for AffineTransform {
 }
 
 impl Transformable for AffineTransform {
+    fn get_base_color(&self) -> Color {
+        self.base_color
+    }
+
     fn transform_point(&self, point: Point) -> Point {
         Point {
-            x: self.a * point.x + self.b * point.y + self.xshift,
-            y: self.c * point.x + self.d * point.y + self.yshift,
+            x: self.a * point.x + self.b * point.y + self.x_shift,
+            y: self.c * point.x + self.d * point.y + self.y_shift,
         }
     }
 
     fn get_weight(&self) -> f32 {
         self.weight
-    }
-
-    fn get_base_color(&self) -> Color {
-        self.base_color
     }
 
     fn get_name(&self) -> String {
@@ -300,14 +300,14 @@ impl Transformable for AffineTransform {
 impl Morphable<AffineTransform> for AffineTransform {
     fn morph(&self, other: Box<&Self>, pct: f32) -> Box<Self> where Self: Sized {
         Box::new(AffineTransform::new(
-                    lerp_f32(self.a, other.a, pct),
-                    lerp_f32(self.b, other.b, pct),
-                    lerp_f32(self.c, other.c, pct),
-                    lerp_f32(self.d, other.d, pct),
-                    lerp_f32(self.xshift, other.xshift, pct),
-                    lerp_f32(self.yshift, other.yshift, pct),
-                    lerp_color(self.base_color, other.base_color, pct),
-                    lerp_f32(self.weight, other.weight, pct)))
+            lerp_f32(self.a, other.a, pct),
+            lerp_f32(self.b, other.b, pct),
+            lerp_f32(self.c, other.c, pct),
+            lerp_f32(self.d, other.d, pct),
+            lerp_f32(self.x_shift, other.x_shift, pct),
+            lerp_f32(self.y_shift, other.y_shift, pct),
+            lerp_color(self.base_color, other.base_color, pct),
+            lerp_f32(self.weight, other.weight, pct)))
     }
 }
 
@@ -347,7 +347,7 @@ impl MoebiusTransform {
         let c: Complex32 = random_complex_number();
         let d: Complex32 = random_complex_number();
 
-        let mut rng = rand::thread_rng();
+        let mut rng = thread_rng();
 
         let normal: Normal<f64> = Normal::new(1.0, 0.15).unwrap();
         let weight: f32 = normal.sample(&mut rng) as f32;
@@ -380,6 +380,10 @@ impl Default for MoebiusTransform {
 }
 
 impl Transformable for MoebiusTransform {
+    fn get_base_color(&self) -> Color {
+        self.base_color
+    }
+
     fn transform_point(&self, point: Point) -> Point {
         let z = Complex32 {
             re: point.x,
@@ -391,10 +395,6 @@ impl Transformable for MoebiusTransform {
 
     fn get_weight(&self) -> f32 {
         self.weight
-    }
-
-    fn get_base_color(&self) -> Color {
-        self.base_color
     }
 
     fn get_name(&self) -> String {
@@ -435,7 +435,7 @@ impl InverseJuliaTransform {
     }
 
     pub fn random() -> InverseJuliaTransform {
-        let mut rng = rand::thread_rng();
+        let mut rng = thread_rng();
 
         let r: f32 = rng.gen::<f32>().sqrt() * 0.4 + 0.8;
         let theta: f32 = 2.0 * PI * rng.gen::<f32>();
@@ -463,6 +463,9 @@ impl Default for InverseJuliaTransform {
 }
 
 impl Transformable for InverseJuliaTransform {
+    fn get_base_color(&self) -> Color {
+        self.base_color
+    }
 
     fn transform_point(&self, point: Point) -> Point {
         let c = Complex32::new(self.r * self.theta.cos(), self.r * self.theta.sin());
@@ -473,7 +476,7 @@ impl Transformable for InverseJuliaTransform {
         };
         let z2 = c - z;
         let new_theta = z2.im.atan2(z2.re) * 0.5;
-        let sqrt_r = vec![1., -1.].choose(&mut rand::thread_rng()).unwrap()
+        let sqrt_r = vec![1., -1.].choose(&mut thread_rng()).unwrap()
             * ((z2.im * z2.im + z2.re * z2.re).powf(0.25));
         Point {
             x: sqrt_r * new_theta.cos(),
@@ -483,10 +486,6 @@ impl Transformable for InverseJuliaTransform {
 
     fn get_weight(&self) -> f32 {
         self.weight
-    }
-
-    fn get_base_color(&self) -> Color {
-        self.base_color
     }
 
     fn get_name(&self) -> String {
