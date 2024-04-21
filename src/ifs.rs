@@ -2,7 +2,6 @@
 use rand::prelude::*;
 use rand::distributions::WeightedIndex;
 use rand_distr::Distribution;
-use crate::transform;
 use crate::util::*;
 use crate::transform::*;
 use crate::image::*;
@@ -36,14 +35,17 @@ impl IFS{
         self.total_weight = self.transforms.iter().map(|t| t.get_weight()).sum();
     }
 
+    /// Get the number of transforms in an IFS
     pub fn len(&self) -> usize {
         self.num_transforms
     }
 
+    /// True if there are no transforms in the IFS, False otherwise
     pub fn is_empty(&self) -> bool {
         self.num_transforms == 0
     }
 
+    /// Get the transform at index i
     pub fn get_transform(&self, i: usize) -> Transform {
         if i < self.len() {
             *self.transforms.get(i).unwrap()
@@ -52,6 +54,8 @@ impl IFS{
         }
     }
 
+    /// Check that all the transforms in one IFS are the
+    /// same as another IFS (values can be different)
     pub fn check_transforms_match(&self, other: &Self) -> bool {
         if self.transforms.len() != other.transforms.len() {
             false
@@ -80,6 +84,7 @@ impl IFS{
         self.distribution = WeightedIndex::new(self.transforms.iter().map(|t| t.get_weight())).unwrap(); 
     }
 
+    /// Remove a transform from an IFS
     pub fn delete_transform(&mut self, index: usize) {
         let transform = self.transforms.get(index).unwrap();
         self.total_weight -= transform.get_weight();
