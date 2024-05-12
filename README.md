@@ -8,7 +8,7 @@ Make your own images like this! Look at at all the variety in the [examples](exa
 ![example image](https://github.com/jmbhughes/barnsley/blob/main/examples/example4.png?raw=true)
 
 ## Make your own!
-You can use [https://barnsley.dev](https://barnsley.dev) to generate your own IFS and animations right in the browser. 
+You can use [this website](https://jmbhughes.com/barnsley_gui/) to generate your own IFS and animations right in the browser. 
 
 This website is built in the [barnsley_gui repo](https://github.com/jmbhughes/barnsley_gui). 
 
