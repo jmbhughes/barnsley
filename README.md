@@ -35,7 +35,7 @@ A config json file specifies the image properties, the evaluation properties, an
 It can be used to recreate an image at a later date. 
 
 1. Install with `cargo install barnsley`. 
-2. Using Rust, run `barnsley construct examples/example7.json`
+2. Using Rust, run `barnsley evaluate examples/example7.json`
 3. Look at the example7.png file to see the result. Note how it matches the one in the examples directory!
 
 
